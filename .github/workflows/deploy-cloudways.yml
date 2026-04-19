@@ -1,0 +1,87 @@
+# Cloudways 자동 배포 (GitHub Actions)
+#
+# 필요한 Repository Secrets:
+#   DEPLOY_HOST     — SSH 호스트 (예: 165.22.xxx.xxx)
+#   DEPLOY_USER     — SSH 사용자 (예: master_xxxxx)
+#   DEPLOY_SSH_KEY  — 배포용 SSH 개인 키 전체 (PEM, 줄바꿈 포함)
+#   DEPLOY_PATH     — 앱 루트 절대 경로 (예: /home/master/applications/xxxxx/public_html)
+# 선택:
+#   DEPLOY_PORT     — SSH 포트 (미설정 시 22)
+#
+# 소스만 서버로 전송 → 서버에서 npm ci + build + PM2 reload
+
+name: Deploy to Cloudways
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudways
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy source and build on server
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+          SSH_USER: ${{ secrets.DEPLOY_USER }}
+          SSH_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -e
+          for v in SSH_KEY SSH_HOST SSH_USER DEPLOY_PATH; do
+            eval "val=\$$v"
+            if [ -z "$val" ]; then
+              echo "Missing secret: $v"
+              exit 1
+            fi
+          done
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          PORT="${SSH_PORT:-22}"
+          ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          SSH_OPTS="-i ~/.ssh/deploy_key -p $PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          RSYNC_RSH="ssh $SSH_OPTS"
+
+          # 소스만 전송 — filter "protect"로 서버 전용 항목이 --delete로 지워지지 않게 보호
+          rsync -rlzv --delete --omit-dir-times \
+            -e "$RSYNC_RSH" \
+            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
+            --filter 'protect .env' \
+            --filter 'protect .htaccess' \
+            --filter 'protect node_modules/' \
+            --filter 'protect .next/' \
+            --filter 'protect public/uploads/' \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '.cursor' \
+            --exclude '.env' \
+            --exclude 'node_modules' \
+            --exclude '.next' \
+            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+
+          # 서버에서 install → build → PM2 reload
+          ssh $SSH_OPTS "${SSH_USER}@${SSH_HOST}" bash -lc "
+            set -e
+            cd \"${DEPLOY_PATH}\"
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"
+            npm ci --production=false
+            npm run build
+            if pm2 describe snapnote > /dev/null 2>&1; then
+              pm2 reload ecosystem.config.cjs --update-env
+            else
+              pm2 start ecosystem.config.cjs
+            fi
+            pm2 save
+          "
