@@ -7,7 +7,7 @@ type Props = {
   priority?: boolean;
 };
 
-export function AppIcon({ size = 28, className, alt = "SnapMath", priority }: Props) {
+export function AppIcon({ size = 28, className, alt = "SnapNote", priority }: Props) {
   return (
     <Image
       src="/site-title-icon.png"

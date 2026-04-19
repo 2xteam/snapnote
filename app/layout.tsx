@@ -3,8 +3,8 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SnapMath",
-  description: "SnapMath — 수학 학습 도우미",
+  title: "SnapNote",
+  description: "SnapNote — 오답노트 학습 도우미",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const themeInitScript = `
 (function(){
   try {
-    var STORAGE_KEY = 'snapmath_theme';
+    var STORAGE_KEY = 'snapnote_theme';
     var raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     var stored = JSON.parse(raw);

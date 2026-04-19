@@ -302,13 +302,13 @@ export function FloatingChat() {
                       >
                         {isPendingAi ? (
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                            <span className="snapmath-chat-wait" style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                            <span className="snapnote-chat-wait" style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                               응답을 작성하는 중입니다…
                             </span>
                             <span style={{ display: "flex", alignItems: "center" }} aria-hidden>
-                              <span className="snapmath-chat-dot" />
-                              <span className="snapmath-chat-dot" />
-                              <span className="snapmath-chat-dot" />
+                              <span className="snapnote-chat-dot" />
+                              <span className="snapnote-chat-dot" />
+                              <span className="snapnote-chat-dot" />
                             </span>
                           </div>
                         ) : (

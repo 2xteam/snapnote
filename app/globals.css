@@ -172,32 +172,32 @@ a:hover {
 
 /* ── Animations ── */
 
-@keyframes snapmath-breathe {
+@keyframes snapnote-breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
 
-@keyframes snapmath-chat-pulse {
+@keyframes snapnote-chat-pulse {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 1; }
 }
 
-.snapmath-chat-wait {
-  animation: snapmath-chat-pulse 1s ease-in-out infinite;
+.snapnote-chat-wait {
+  animation: snapnote-chat-pulse 1s ease-in-out infinite;
 }
 
-.snapmath-chat-dot {
+.snapnote-chat-dot {
   display: inline-block;
   width: 7px;
   height: 7px;
   margin-right: 4px;
   border-radius: 50%;
   background: var(--text-muted);
-  animation: snapmath-chat-pulse 1s ease-in-out infinite;
+  animation: snapnote-chat-pulse 1s ease-in-out infinite;
 }
 
-.snapmath-chat-dot:nth-child(2) { animation-delay: 0.2s; }
-.snapmath-chat-dot:nth-child(3) { animation-delay: 0.4s; }
+.snapnote-chat-dot:nth-child(2) { animation-delay: 0.2s; }
+.snapnote-chat-dot:nth-child(3) { animation-delay: 0.4s; }
 
 /* ── Chat Markdown ── */
 

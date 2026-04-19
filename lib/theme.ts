@@ -40,7 +40,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   },
 ];
 
-const STORAGE_KEY = "snapmath_theme";
+const STORAGE_KEY = "snapnote_theme";
 
 type StoredTheme = { id: ThemeId; custom?: ThemeCustomColor };
 

@@ -27,11 +27,15 @@ export function TopNav() {
         <div className="topnav-bar">
           <Link href="/home" className="topnav-logo">
             <AppIcon size={26} alt="" priority className="topnav-logo-icon" />
-            SnapMath
+            SnapNote
           </Link>
           <div className="topnav-links">
             {nav.map(({ href, label }) => {
-              const active = pathname === href || pathname.startsWith(`${href}/`);
+              const active = href === "/home"
+                ? pathname === "/home"
+                : href === "/folders"
+                  ? pathname.startsWith("/folders") || pathname.startsWith("/note/")
+                  : pathname === href || pathname.startsWith(`${href}/`);
               return <Link key={href} href={href} className="topnav-link" data-active={active}>{label}</Link>;
             })}
             <button type="button" onClick={logout} className="topnav-logout">Logout</button>
@@ -44,7 +48,11 @@ export function TopNav() {
         </div>
         <div className="topnav-menu">
           {nav.map(({ href, label }) => {
-            const active = pathname === href || pathname.startsWith(`${href}/`);
+            const active = href === "/home"
+              ? pathname === "/home"
+              : href === "/folders"
+                ? pathname.startsWith("/folders") || pathname.startsWith("/note/")
+                : pathname === href || pathname.startsWith(`${href}/`);
             return <Link key={href} href={href} className="topnav-menu-link" data-active={active} onClick={() => setOpen(false)}>{label}</Link>;
           })}
           <button type="button" onClick={() => { setOpen(false); logout(); }} className="topnav-logout topnav-menu-logout">Logout</button>

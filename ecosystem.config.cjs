@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "snapmath",
+      name: "snapnote",
       cwd: __dirname,
       script: "npm",
       args: "run start",

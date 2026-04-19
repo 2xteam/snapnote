@@ -4,7 +4,6 @@ import { connectDB } from "@/lib/db";
 import { normalizePhone } from "@/lib/phone";
 import { WrongNote } from "@/models/WrongNote";
 import { WrongItem } from "@/models/WrongItem";
-import { clampBox } from "@/lib/problemTypes";
 
 export const runtime = "nodejs";
 
@@ -49,6 +48,9 @@ export async function POST(req: Request) {
     if (!mongoose.isValidObjectId(noteId) || !phone) {
       return NextResponse.json({ ok: false, error: "noteId, phone이 필요합니다." }, { status: 400 });
     }
+    if (!imageUrl) {
+      return NextResponse.json({ ok: false, error: "imageUrl이 필요합니다." }, { status: 400 });
+    }
 
     await connectDB();
     const note = await WrongNote.findById(noteId).exec();
@@ -58,52 +60,8 @@ export async function POST(req: Request) {
 
     const nid = new mongoose.Types.ObjectId(noteId);
 
-    if (Array.isArray(o.problems)) {
-      const ids: string[] = [];
-      for (const it of o.problems) {
-        if (!it || typeof it !== "object") continue;
-        const p = it as Record<string, unknown>;
-        const questionText = str(p.questionText);
-        if (!questionText) continue;
-        const layout = clampBox(p.layout);
-        const answerArea = p.answerArea ? clampBox(p.answerArea) : { ...layout };
-        const doc = await WrongItem.create({
-          noteId: nid,
-          problemId: str(p.problemId),
-          questionNumber: typeof p.questionNumber === "number" ? p.questionNumber : 0,
-          questionText,
-          type: str(p.type, "calculation"),
-          layout,
-          answerArea,
-          userAnswer: str(p.userAnswer),
-          correctAnswer: str(p.correctAnswer),
-          isWrong: p.isWrong !== false,
-          imageUrl,
-        });
-        ids.push(String(doc._id));
-      }
-      return NextResponse.json({ ok: true, ids, count: ids.length });
-    }
-
-    const questionText = str(o.questionText);
-    if (!questionText) {
-      return NextResponse.json({ ok: false, error: "questionText가 필요합니다." }, { status: 400 });
-    }
-
-    const layout = clampBox(o.layout);
-    const answerArea = o.answerArea ? clampBox(o.answerArea) : { ...layout };
-
     const doc = await WrongItem.create({
       noteId: nid,
-      problemId: str(o.problemId),
-      questionNumber: typeof o.questionNumber === "number" ? o.questionNumber : 0,
-      questionText,
-      type: str(o.type, "calculation"),
-      layout,
-      answerArea,
-      userAnswer: str(o.userAnswer),
-      correctAnswer: str(o.correctAnswer),
-      isWrong: o.isWrong !== false,
       imageUrl,
     });
 

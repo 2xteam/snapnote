@@ -267,7 +267,7 @@ function FileIcon() {
 
 function FolderPlusIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M12 11v4M10 13h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
@@ -276,7 +276,7 @@ function FolderPlusIcon() {
 
 function FilePlusIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M12 12v4M10 14h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
@@ -285,7 +285,7 @@ function FilePlusIcon() {
 
 function PenIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
       <path d="M15.232 5.232l3.536 3.536M9 13l-2 2v3h3l9-9-3.536-3.536L9 13Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -293,7 +293,7 @@ function PenIcon() {
 
 function TrashIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
       <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );

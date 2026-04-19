@@ -77,7 +77,7 @@ export default function StartPage() {
           }}
         >
           <AppIcon size={36} priority className="app-brand-icon" />
-          SnapMath
+          SnapNote
         </h1>
         <p style={{ margin: "0 0 1.5rem", color: "var(--text-secondary)", fontSize: 14 }}>
           전화번호와 PIN으로 로그인하세요.

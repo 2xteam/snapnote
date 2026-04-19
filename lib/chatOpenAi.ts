@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { buildChatRagContext } from "@/lib/chatRagDocuments";
 import { createOpenAiResponse, type ResponsesCreateUsage } from "@/lib/openAiConversations";
 
-const CHAT_INSTRUCTIONS = `당신은 SnapMath 앱의 챗봇입니다.
+const CHAT_INSTRUCTIONS = `당신은 SnapNote 앱의 챗봇입니다.
 사용자의 질문에 친절하게 답변합니다.`;
 
 export type ChatTurnResult = {

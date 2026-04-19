@@ -9,7 +9,7 @@ export const CHAT_RAG_CHUNKS: ChatRagChunk[] = [
   {
     id: "math-vision-overview",
     keywords: ["오답", "사진", "시험지", "문제집", "비전", "vision", "OCR", "분석", "캔버스"],
-    body: `SnapMath는 수학 시험지/문제집 사진에서 틀린 문제를 AI로 추출하고, 이미지 위에 좌표 기반 오버레이로 표시합니다.
+    body: `SnapNote는 수학 시험지/문제집 사진에서 틀린 문제를 AI로 추출하고, 이미지 위에 좌표 기반 오버레이로 표시합니다.
 
 핵심 흐름:
 1. 사진 업로드 → OpenAI Vision API가 이미지 분석
