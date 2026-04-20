@@ -152,7 +152,7 @@ export default function NoteDetailPage() {
 
         <label style={{ ...headerBtn, cursor: "pointer" }} title="사진 추가">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-          <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { onFileSelected(e.target.files?.[0] ?? null); e.target.value = ""; }} />
+          <input type="file" accept="image/*" hidden onChange={(e) => { onFileSelected(e.target.files?.[0] ?? null); e.target.value = ""; }} />
         </label>
 
         {items.length > 0 && (
@@ -169,7 +169,7 @@ export default function NoteDetailPage() {
           <p style={{ color: "var(--text-muted)", fontSize: 14 }}>아직 추가된 문제가 없습니다.</p>
           <label style={{ ...actionBtn, cursor: "pointer" }}>
             📷 사진으로 문제 추가
-            <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { onFileSelected(e.target.files?.[0] ?? null); e.target.value = ""; }} />
+            <input type="file" accept="image/*" hidden onChange={(e) => { onFileSelected(e.target.files?.[0] ?? null); e.target.value = ""; }} />
           </label>
         </div>
       ) : (

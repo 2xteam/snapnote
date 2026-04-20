@@ -108,18 +108,28 @@ export default function StartPage() {
         >
           {busy ? "확인 중…" : "로그인"}
         </button>
-        <Link
-          href="/register"
-          style={{
-            display: "block",
-            textAlign: "center",
-            color: "var(--accent)",
-            fontSize: 14,
-            textDecoration: "none",
-          }}
-        >
-          회원가입
-        </Link>
+        <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem" }}>
+          <Link
+            href="/register"
+            style={{
+              color: "var(--accent)",
+              fontSize: 14,
+              textDecoration: "none",
+            }}
+          >
+            회원가입
+          </Link>
+          <Link
+            href="/reset-pin"
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: 14,
+              textDecoration: "none",
+            }}
+          >
+            PIN 변경
+          </Link>
+        </div>
         {msg ? (
           <p style={{ margin: "1rem 0 0", color: "var(--danger)", fontSize: 13 }}>{msg}</p>
         ) : null}
