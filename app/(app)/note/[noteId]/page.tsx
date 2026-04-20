@@ -88,6 +88,8 @@ export default function NoteDetailPage() {
     try {
       const fd = new FormData();
       fd.set("file", file);
+      fd.set("phone", session.phone);
+      fd.set("noteId", noteId);
       const uploadRes = await fetch("/api/upload-image", { method: "POST", body: fd });
       const uploadJson = (await uploadRes.json()) as { ok: boolean; url?: string; error?: string };
       if (!uploadRes.ok || !uploadJson.ok || !uploadJson.url) {

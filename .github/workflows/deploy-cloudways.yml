@@ -61,7 +61,6 @@ jobs:
             --filter 'protect .htaccess' \
             --filter 'protect node_modules/' \
             --filter 'protect .next/' \
-            --filter 'protect public/uploads/' \
             --exclude '.git' \
             --exclude '.github' \
             --exclude '.cursor' \

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import crypto from "crypto";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getR2Client, getR2Bucket, getR2PublicUrl } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -27,15 +27,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "파일이 너무 큽니다. (최대 10MB)" }, { status: 413 });
     }
 
+    const phone = (formData.get("phone") as string | null)?.trim() ?? "";
+    const noteId = (formData.get("noteId") as string | null)?.trim() ?? "";
     const ext = file.name.split(".").pop() ?? "jpg";
     const hash = crypto.randomBytes(12).toString("hex");
     const filename = `${Date.now()}-${hash}.${ext}`;
+    const key = phone && noteId
+      ? `${phone}/${noteId}/${filename}`
+      : filename;
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), Buffer.from(arrayBuffer));
+    const client = getR2Client();
+    await client.send(
+      new PutObjectCommand({
+        Bucket: getR2Bucket(),
+        Key: key,
+        Body: Buffer.from(arrayBuffer),
+        ContentType: file.type,
+      }),
+    );
 
-    return NextResponse.json({ ok: true, url: `/uploads/${filename}` });
+    const publicUrl = `${getR2PublicUrl()}/${key}`;
+    return NextResponse.json({ ok: true, url: publicUrl });
   } catch (err) {
     const message = err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
