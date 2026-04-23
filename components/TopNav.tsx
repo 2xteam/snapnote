@@ -15,7 +15,7 @@ const nav = [
 ];
 
 const otherApps = [
-  { name: "SnapWord", iconUrl: "https://snapword.myjane.co.kr/site-title-icon.png", href: "https://snapword.myjane.co.kr/home" },
+  { name: "SnapWord", iconUrl: "/snapword-link-icon.png", href: "https://snapword.myjane.co.kr/home" },
 ];
 
 export function TopNav() {
