@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "SnapNote",
   description: "SnapNote — 오답노트 학습 도우미",
   icons: {
-    icon: "/icon.png",
+    icon: "/favicon.png",
     apple: "/icon.png",
   },
 };
