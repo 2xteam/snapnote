@@ -128,13 +128,12 @@ const thumbCard: CSSProperties = {
   minWidth: 100,
   height: 100,
   flexShrink: 0,
-  borderRadius: 12,
-  border: "1px solid var(--border)",
+  borderRadius: "var(--radius-md)",
   background: "var(--bg-card)",
   textDecoration: "none",
   scrollSnapAlign: "start",
   padding: "0.5rem",
-  transition: "background 0.1s",
+  transition: "background 0.15s",
 };
 
 const thumbLabel: CSSProperties = {

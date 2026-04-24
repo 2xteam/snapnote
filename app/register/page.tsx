@@ -78,10 +78,9 @@ export default function RegisterPage() {
           width: "100%",
           maxWidth: 400,
           background: "var(--bg-card)",
-          borderRadius: 20,
+          borderRadius: "var(--radius-xl)",
           padding: "2rem",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4)",
-          border: "1px solid var(--border)",
         }}
       >
         <h1 style={{ margin: "0 0 0.25rem", fontSize: "1.5rem", color: "var(--text-primary)" }}>
@@ -120,10 +119,10 @@ export default function RegisterPage() {
             width: "100%",
             marginTop: "0.5rem",
             padding: "0.85rem",
-            borderRadius: 12,
+            borderRadius: "var(--radius-sm)",
             border: "none",
             background: busy ? "var(--text-muted)" : "var(--accent)",
-            color: "#fff",
+            color: "#000",
             fontWeight: 600,
             cursor: busy ? "default" : "pointer",
           }}
@@ -158,7 +157,7 @@ const lab: CSSProperties = {
 
 const inp: CSSProperties = {
   padding: "0.65rem 0.75rem",
-  borderRadius: 10,
+  borderRadius: "var(--radius-sm)",
   border: "1px solid var(--input-border)",
   background: "var(--input-bg)",
   color: "var(--text-primary)",

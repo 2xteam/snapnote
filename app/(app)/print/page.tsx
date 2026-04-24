@@ -120,14 +120,14 @@ export default function PrintPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8, maxHeight: 400, overflow: "auto" }}>
           {items.map((it) => (
-            <label key={it._id} style={{ cursor: "pointer", position: "relative", borderRadius: 10, overflow: "hidden", border: pick[it._id] ? "2px solid var(--accent)" : "2px solid var(--border)", transition: "border-color 0.15s" }}>
+            <label key={it._id} style={{ cursor: "pointer", position: "relative", borderRadius: "var(--radius-sm)", overflow: "hidden", border: pick[it._id] ? "2px solid var(--accent)" : "2px solid var(--border)", transition: "border-color 0.15s" }}>
               <input type="checkbox" className="custom-checkbox" checked={Boolean(pick[it._id])} onChange={(e) => setPick((p) => ({ ...p, [it._id]: e.target.checked }))} style={{ position: "absolute", top: 6, left: 6, zIndex: 2 }} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={it.imageUrl} alt="문제" style={{ width: "100%", display: "block", aspectRatio: "1", objectFit: "cover" }} />
             </label>
           ))}
         </div>
-        <button type="button" onClick={doPrint} disabled={printableItems.length === 0} style={{ marginTop: 12, width: "100%", padding: "0.75rem", background: printableItems.length > 0 ? "var(--accent)" : "var(--bg-elevated)", color: printableItems.length > 0 ? "#fff" : "var(--text-muted)", border: "none", fontWeight: 600, borderRadius: 10, cursor: printableItems.length > 0 ? "pointer" : "default" }}>
+        <button type="button" onClick={doPrint} disabled={printableItems.length === 0} style={{ marginTop: 12, width: "100%", padding: "0.75rem", background: printableItems.length > 0 ? "var(--accent)" : "var(--bg-elevated)", color: printableItems.length > 0 ? "#000" : "var(--text-muted)", border: "none", fontWeight: 600, borderRadius: "var(--radius-sm)", cursor: printableItems.length > 0 ? "pointer" : "default" }}>
           🖨️ 인쇄 ({printableItems.length}개)
         </button>
       </section>
@@ -180,4 +180,4 @@ function escapeAttr(s: string) {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-const cardStyle: CSSProperties = { background: "var(--bg-card)", borderRadius: 16, padding: "1rem", border: "1px solid var(--border)" };
+const cardStyle: CSSProperties = { background: "var(--bg-card)", borderRadius: "var(--radius-lg)", padding: "1rem" };

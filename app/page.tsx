@@ -60,10 +60,9 @@ export default function StartPage() {
           width: "100%",
           maxWidth: 400,
           background: "var(--bg-card)",
-          borderRadius: 20,
+          borderRadius: "var(--radius-xl)",
           padding: "2rem",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4)",
-          border: "1px solid var(--border)",
         }}
       >
         <h1
@@ -77,7 +76,7 @@ export default function StartPage() {
           }}
         >
           <AppIcon size={36} priority className="app-brand-icon" />
-          SnapNote
+          <span style={{ fontStyle: "italic", fontWeight: 900, color: "var(--accent)" }}>SnapNote</span>
         </h1>
         <p style={{ margin: "0 0 1.5rem", color: "var(--text-secondary)", fontSize: 14 }}>
           전화번호와 PIN으로 로그인하세요.
@@ -97,13 +96,14 @@ export default function StartPage() {
           style={{
             width: "100%",
             padding: "0.85rem",
-            borderRadius: 12,
+            borderRadius: "var(--radius-md)",
             border: "none",
             background: busy ? "var(--text-muted)" : "var(--accent)",
-            color: "#fff",
-            fontWeight: 600,
+            color: "#000",
+            fontWeight: 700,
             cursor: busy ? "default" : "pointer",
             marginBottom: "0.75rem",
+            fontSize: 15,
           }}
         >
           {busy ? "확인 중…" : "로그인"}
@@ -147,8 +147,8 @@ const lab: CSSProperties = {
 };
 
 const inp: CSSProperties = {
-  padding: "0.65rem 0.75rem",
-  borderRadius: 10,
+  padding: "0.65rem 0.85rem",
+  borderRadius: "var(--radius-md)",
   border: "1px solid var(--input-border)",
   background: "var(--input-bg)",
   color: "var(--text-primary)",

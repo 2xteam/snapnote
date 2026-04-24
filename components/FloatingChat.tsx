@@ -233,7 +233,7 @@ export function FloatingChat() {
           aria-label="채팅 열기"
           style={fabStyle}
         >
-          <RobotIcon />
+          <SmileyFabIcon />
         </button>
       )}
 
@@ -294,8 +294,8 @@ export function FloatingChat() {
                           maxWidth: "88%",
                           padding: "0.45rem 0.65rem",
                           borderRadius: isUser ? "10px 10px 3px 10px" : "10px 10px 10px 3px",
-                          background: isUser ? "var(--chat-fab-bg)" : m._id.startsWith("err-") ? "var(--danger-subtle)" : "var(--bg-elevated)",
-                          color: isUser ? "var(--chat-fab-fg)" : m._id.startsWith("err-") ? "#fca5a5" : "var(--text-primary)",
+                          background: isUser ? "var(--accent)" : m._id.startsWith("err-") ? "var(--danger-subtle)" : "var(--bg-elevated)",
+                          color: isUser ? "#fff" : m._id.startsWith("err-") ? "#fca5a5" : "var(--text-primary)",
                           fontSize: 13,
                           border: isPendingAi ? "1px dashed var(--text-muted)" : undefined,
                         }}
@@ -432,16 +432,15 @@ export function FloatingChat() {
 
 /* ── Icons ── */
 
-function RobotIcon({ size = 24 }: { size?: number }) {
+function SmileyFabIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="4" y="8" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="9" cy="14" r="1.5" fill="currentColor" />
-      <circle cx="15" cy="14" r="1.5" fill="currentColor" />
-      <path d="M10 18h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M12 4v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="12" cy="3.5" r="1.5" fill="currentColor" />
-      <path d="M2 13h2M20 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden>
+      <circle cx="32" cy="32" r="31" fill="var(--accent)" />
+      <circle cx="22" cy="26" r="4.5" fill="rgba(0,0,0,0.55)" />
+      <circle cx="42" cy="26" r="4.5" fill="rgba(0,0,0,0.55)" />
+      <circle cx="23.5" cy="24" r="1.5" fill="rgba(255,255,255,0.5)" />
+      <circle cx="43.5" cy="24" r="1.5" fill="rgba(255,255,255,0.5)" />
+      <path d="M22 38 Q32 48, 42 38" fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -490,14 +489,14 @@ const fabStyle: CSSProperties = {
   height: 52,
   borderRadius: "50%",
   border: "none",
-  background: "var(--chat-fab-bg)",
-  color: "var(--chat-fab-fg)",
+  background: "none",
+  padding: 0,
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-  transition: "transform 0.15s ease",
+  animation: "fab-spin 6s linear infinite",
+  filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.35))",
 };
 
 const panelStyle: CSSProperties = {
@@ -509,8 +508,7 @@ const panelStyle: CSSProperties = {
   maxWidth: "calc(100vw - 32px)",
   height: 520,
   maxHeight: "calc(100vh - 48px)",
-  borderRadius: 16,
-  border: "1px solid var(--border)",
+  borderRadius: "var(--radius-lg)",
   background: "var(--bg-card)",
   display: "flex",
   flexDirection: "column",
@@ -529,12 +527,12 @@ const headerStyle: CSSProperties = {
 };
 
 const headerBtnStyle: CSSProperties = {
-  background: "var(--bg-primary)",
-  border: "1px solid var(--border)",
-  borderRadius: 6,
+  background: "var(--accent-subtle)",
+  border: "none",
+  borderRadius: 8,
   padding: "0.3rem",
   cursor: "pointer",
-  color: "var(--chat-btn-color)",
+  color: "var(--accent)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -551,12 +549,12 @@ const titleStyle: CSSProperties = {
 };
 
 const newChatBtnStyle: CSSProperties = {
-  background: "var(--bg-primary)",
-  border: "1px solid var(--border)",
-  borderRadius: 6,
+  background: "var(--accent-subtle)",
+  border: "none",
+  borderRadius: 8,
   padding: "0.25rem 0.5rem",
   cursor: "pointer",
-  color: "var(--chat-btn-color)",
+  color: "var(--accent)",
   fontSize: 14,
   fontWeight: 700,
   flexShrink: 0,
@@ -566,12 +564,12 @@ const newChatBtnStyle: CSSProperties = {
 };
 
 const closeBtnStyle: CSSProperties = {
-  background: "var(--bg-primary)",
-  border: "1px solid var(--border)",
-  borderRadius: 6,
+  background: "var(--accent-subtle)",
+  border: "none",
+  borderRadius: 8,
   padding: "0.3rem",
   cursor: "pointer",
-  color: "var(--chat-btn-color)",
+  color: "var(--accent)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -600,10 +598,10 @@ const inputBarStyle: CSSProperties = {
 
 const sendBtnStyle: CSSProperties = {
   padding: "0.4rem 0.7rem",
-  borderRadius: 8,
+  borderRadius: "var(--radius-sm)",
   border: "none",
-  background: "var(--chat-fab-bg)",
-  color: "var(--chat-fab-fg)",
+  background: "var(--accent)",
+  color: "#fff",
   fontSize: 13,
   fontWeight: 600,
   cursor: "pointer",
@@ -616,10 +614,10 @@ const historyNewChatStyle: CSSProperties = {
   width: "100%",
   textAlign: "center",
   padding: "0.4rem",
-  borderRadius: 8,
-  border: "1px solid var(--border)",
-  background: "var(--bg-primary)",
-  color: "var(--chat-btn-color)",
+  borderRadius: "var(--radius-sm)",
+  border: "none",
+  background: "var(--accent)",
+  color: "#fff",
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",

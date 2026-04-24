@@ -37,7 +37,7 @@ export default function MyPage() {
       <h1 style={{ margin: 0, fontSize: "1.3rem", color: "var(--text-primary)" }}>My</h1>
 
       {/* Profile */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem", borderRadius: 14, background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}>
         <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--accent-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
           {session.name.charAt(0)}
         </div>
@@ -48,7 +48,7 @@ export default function MyPage() {
       </div>
 
       {/* Theme selector */}
-      <div style={{ borderRadius: 14, background: "var(--bg-card)", border: "1px solid var(--border)", overflow: "hidden" }}>
+      <div style={{ borderRadius: "var(--radius-lg)", background: "var(--bg-card)", overflow: "hidden" }}>
         <div style={{ padding: "0.85rem 1rem 0.6rem", borderBottom: "1px solid var(--border-subtle)" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>테마</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>앱 전체 색상 분위기를 변경합니다.</div>
@@ -74,15 +74,15 @@ export default function MyPage() {
                   alignItems: "center",
                   gap: 6,
                   padding: "0.65rem 0.4rem",
-                  borderRadius: 12,
-                  border: isActive ? "2px solid var(--accent)" : "1px solid var(--border)",
+                  borderRadius: "var(--radius-md)",
+                  border: isActive ? "2px solid var(--accent)" : "1px solid transparent",
                   background: isActive ? "var(--accent-subtle)" : "var(--bg-elevated)",
                   cursor: "pointer",
                   transition: "border-color 0.15s, background 0.15s",
                 }}
               >
                 <div style={{
-                  width: 36, height: 36, borderRadius: 10,
+                  width: 36, height: 36, borderRadius: "var(--radius-sm)",
                   background: t.id === "custom"
                     ? `linear-gradient(135deg, ${customBg} 50%, ${customAccent} 50%)`
                     : t.preview.bg,
@@ -112,9 +112,9 @@ export default function MyPage() {
         <div style={{
           margin: "0 1rem 0.85rem",
           padding: "0.85rem",
-          borderRadius: 12,
+          borderRadius: "var(--radius-md)",
           background: "var(--bg-elevated)",
-          border: `1px solid ${themeId === "custom" ? "var(--accent)" : "var(--border-subtle)"}`,
+          border: `1px solid ${themeId === "custom" ? "var(--accent)" : "transparent"}`,
           opacity: themeId === "custom" ? 1 : 0.45,
           pointerEvents: themeId === "custom" ? "auto" : "none",
           transition: "opacity 0.2s, border-color 0.2s",
@@ -133,11 +133,11 @@ export default function MyPage() {
               marginTop: "0.65rem",
               width: "100%",
               padding: "0.55rem",
-              borderRadius: 10,
+              borderRadius: "var(--radius-md)",
               border: "none",
               background: customAccent,
-              color: "#fff",
-              fontWeight: 600,
+              color: "#000",
+              fontWeight: 700,
               fontSize: 13,
               cursor: "pointer",
               transition: "filter 0.15s",

@@ -189,7 +189,7 @@ export default function NoteDetailPage() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </button>
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: "var(--radius-sm)" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={it.imageUrl}
@@ -230,13 +230,13 @@ export default function NoteDetailPage() {
   );
 }
 
-const headerBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "var(--bg-elevated)", border: "1px solid var(--border)", color: "var(--text-secondary)", textDecoration: "none", cursor: "pointer" };
-const actionBtn: CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, padding: "0.6rem 1.2rem", borderRadius: 10, background: "var(--accent)", color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 600 };
-const cardStyle: CSSProperties = { borderRadius: 14, padding: "0.75rem", background: "var(--bg-card)", border: "1px solid var(--border)", overflow: "hidden" };
-const cardDeleteBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#fca5a5", cursor: "pointer", padding: 0 };
-const btnCancel: CSSProperties = { padding: "0.55rem 1rem", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", fontWeight: 500, cursor: "pointer", fontSize: 13 };
-const btnDanger: CSSProperties = { padding: "0.55rem 1rem", borderRadius: 10, border: "none", background: "#dc2626", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
+const headerBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border)", color: "var(--text-secondary)", textDecoration: "none", cursor: "pointer" };
+const actionBtn: CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, padding: "0.6rem 1.2rem", borderRadius: "var(--radius-sm)", background: "var(--accent)", color: "#000", textDecoration: "none", fontSize: 14, fontWeight: 600 };
+const cardStyle: CSSProperties = { borderRadius: "var(--radius-lg)", padding: "0.75rem", background: "var(--bg-card)", overflow: "hidden" };
+const cardDeleteBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "var(--radius-sm)", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#fca5a5", cursor: "pointer", padding: 0 };
+const btnCancel: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", fontWeight: 500, cursor: "pointer", fontSize: 13 };
+const btnDanger: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "none", background: "#dc2626", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
 const overlayFull: CSSProperties = { position: "fixed", inset: 0, zIndex: 300, background: "rgba(10,10,15,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 };
 const overlayDim: CSSProperties = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 200 };
-const dialogBoxStyle: CSSProperties = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 201, width: "min(92vw, 420px)", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: "1.5rem", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" };
+const dialogBoxStyle: CSSProperties = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 201, width: "min(92vw, 420px)", background: "var(--bg-card)", borderRadius: "var(--radius-lg)", padding: "1.5rem", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" };
 const spinnerStyle: CSSProperties = { width: 40, height: 40, border: "3px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" };

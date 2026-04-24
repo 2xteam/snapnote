@@ -196,7 +196,7 @@ const rowStyle: CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "0.5rem 0.5rem",
-  borderRadius: 8,
+  borderRadius: "var(--radius-sm)",
 };
 
 const btnRestore: CSSProperties = {
@@ -223,10 +223,10 @@ const btnPermDelete: CSSProperties = {
 
 const btnAccent: CSSProperties = {
   padding: "0.55rem 1rem",
-  borderRadius: 10,
+  borderRadius: "var(--radius-sm)",
   border: "none",
   background: "var(--accent)",
-  color: "#fff",
+  color: "#000",
   fontWeight: 600,
   cursor: "pointer",
   fontSize: 13,
@@ -234,7 +234,7 @@ const btnAccent: CSSProperties = {
 
 const btnDanger: CSSProperties = {
   padding: "0.55rem 1rem",
-  borderRadius: 10,
+  borderRadius: "var(--radius-sm)",
   border: "none",
   background: "#dc2626",
   color: "#fff",
@@ -245,7 +245,7 @@ const btnDanger: CSSProperties = {
 
 const btnCancel: CSSProperties = {
   padding: "0.55rem 1rem",
-  borderRadius: 10,
+  borderRadius: "var(--radius-sm)",
   border: "1px solid var(--border)",
   background: "var(--bg-elevated)",
   color: "var(--text-secondary)",
@@ -269,8 +269,7 @@ const dialogBoxStyle: CSSProperties = {
   zIndex: 201,
   width: "min(90vw, 400px)",
   background: "var(--bg-card)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
+  borderRadius: "var(--radius-lg)",
   padding: "1.5rem",
   boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
 };

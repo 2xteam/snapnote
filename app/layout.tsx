@@ -24,8 +24,8 @@ const themeInitScript = `
     document.documentElement.setAttribute('data-theme', stored.id);
 
     if (stored.id === 'custom' && stored.custom) {
-      var bg = stored.custom.bg || '#0a0a0f';
-      var accent = stored.custom.accent || '#3b82f6';
+      var bg = stored.custom.bg || '#000000';
+      var accent = stored.custom.accent || '#2ee8ae';
 
       function hexToRgb(hex) {
         var m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex.trim());
@@ -37,8 +37,8 @@ const themeInitScript = `
         return 0.2126*lin(r)+0.7152*lin(g)+0.0722*lin(b);
       }
 
-      var bgRgb   = hexToRgb(bg)     || [10,10,15];
-      var accRgb  = hexToRgb(accent) || [59,130,246];
+      var bgRgb   = hexToRgb(bg)     || [0,0,0];
+      var accRgb  = hexToRgb(accent) || [46,232,174];
       var isDark  = luminance(bgRgb[0],bgRgb[1],bgRgb[2]) < 0.4;
 
       function mix(base, ratio) {
@@ -53,21 +53,21 @@ const themeInitScript = `
         '--bg-secondary':  mix(bgRgb,0.18),
         '--bg-card':       mix(bgRgb,0.3),
         '--bg-elevated':   mix(bgRgb,0.45),
-        '--border':        isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.1)',
-        '--border-subtle': isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)',
-        '--text-primary':  isDark?'#e8e8ed':'#111118',
-        '--text-secondary':isDark?'#8b8b9e':'#4a4a5a',
-        '--text-muted':    isDark?'#5c5c6f':'#9090a0',
+        '--border':        isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',
+        '--border-subtle': isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)',
+        '--text-primary':  isDark?'#ffffff':'#1a1a1a',
+        '--text-secondary':isDark?'#999999':'#666666',
+        '--text-muted':    isDark?'#555555':'#aaaaaa',
         '--accent':        accent,
         '--accent-hover':  'rgb('+Math.max(ar-20,0)+','+Math.max(ag-20,0)+','+Math.max(ab-20,0)+')',
         '--accent-subtle': 'rgba('+ar+','+ag+','+ab+',0.14)',
-        '--danger':        '#ef4444',
-        '--danger-subtle': 'rgba(239,68,68,0.12)',
-        '--success':       '#22c55e',
-        '--success-subtle':'rgba(34,197,94,0.12)',
-        '--warning':       '#f59e0b',
+        '--danger':        '#ff4e6a',
+        '--danger-subtle': 'rgba(255,78,106,0.12)',
+        '--success':       '#2ee8ae',
+        '--success-subtle':'rgba(46,232,174,0.12)',
+        '--warning':       '#ffc233',
         '--input-bg':      mix(bgRgb,0.35),
-        '--input-border':  isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.14)',
+        '--input-border':  isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)',
       };
       var root = document.documentElement;
       Object.keys(vars).forEach(function(k){ root.style.setProperty(k, vars[k]); });

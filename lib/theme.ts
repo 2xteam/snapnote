@@ -18,25 +18,25 @@ export const PRESET_THEMES: ThemeConfig[] = [
     id: "dark",
     label: "다크",
     dataAttr: "dark",
-    preview: { bg: "#0a0a0f", accent: "#3b82f6", text: "#e8e8ed" },
+    preview: { bg: "#000000", accent: "#2ee8ae", text: "#ffffff" },
   },
   {
     id: "light",
     label: "화이트",
     dataAttr: "light",
-    preview: { bg: "#f5f5f7", accent: "#2563eb", text: "#111118" },
+    preview: { bg: "#f2f2f7", accent: "#1ab485", text: "#1a1a1a" },
   },
   {
     id: "violet",
-    label: "바이올렛",
+    label: "네온핑크",
     dataAttr: "violet",
-    preview: { bg: "#0d0b1a", accent: "#8b5cf6", text: "#ede9fe" },
+    preview: { bg: "#050008", accent: "#ff4ecd", text: "#f8f0ff" },
   },
   {
     id: "custom",
     label: "커스텀",
     dataAttr: "custom",
-    preview: { bg: "#0a0a0f", accent: "#3b82f6", text: "#e8e8ed" },
+    preview: { bg: "#000000", accent: "#2ee8ae", text: "#ffffff" },
   },
 ];
 
@@ -79,8 +79,8 @@ function luminance(r: number, g: number, b: number): number {
 }
 
 export function buildCustomVars(custom: ThemeCustomColor): Record<string, string> {
-  const bgRgb = hexToRgb(custom.bg) ?? [10, 10, 15];
-  const accentRgb = hexToRgb(custom.accent) ?? [59, 130, 246];
+  const bgRgb = hexToRgb(custom.bg) ?? [0, 0, 0];
+  const accentRgb = hexToRgb(custom.accent) ?? [46, 232, 174];
   const lum = luminance(...bgRgb);
   const isDark = lum < 0.4;
 
@@ -98,20 +98,20 @@ export function buildCustomVars(custom: ThemeCustomColor): Record<string, string
     "--bg-secondary": mix(bgRgb, 0.18),
     "--bg-card": mix(bgRgb, 0.3),
     "--bg-elevated": mix(bgRgb, 0.45),
-    "--border": isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.1)",
-    "--border-subtle": isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)",
-    "--text-primary": isDark ? "#e8e8ed" : "#111118",
-    "--text-secondary": isDark ? "#8b8b9e" : "#4a4a5a",
-    "--text-muted": isDark ? "#5c5c6f" : "#9090a0",
+    "--border": isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+    "--border-subtle": isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    "--text-primary": isDark ? "#ffffff" : "#1a1a1a",
+    "--text-secondary": isDark ? "#999999" : "#666666",
+    "--text-muted": isDark ? "#555555" : "#aaaaaa",
     "--accent": custom.accent,
     "--accent-hover": `rgb(${Math.max(ar - 20, 0)},${Math.max(ag - 20, 0)},${Math.max(ab - 20, 0)})`,
     "--accent-subtle": `rgba(${ar},${ag},${ab},0.14)`,
-    "--danger": "#ef4444",
-    "--danger-subtle": "rgba(239,68,68,0.12)",
-    "--success": "#22c55e",
-    "--success-subtle": "rgba(34,197,94,0.12)",
-    "--warning": "#f59e0b",
+    "--danger": "#ff4e6a",
+    "--danger-subtle": "rgba(255,78,106,0.12)",
+    "--success": "#2ee8ae",
+    "--success-subtle": "rgba(46,232,174,0.12)",
+    "--warning": "#ffc233",
     "--input-bg": mix(bgRgb, 0.35),
-    "--input-border": isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.14)",
+    "--input-border": isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
   };
 }

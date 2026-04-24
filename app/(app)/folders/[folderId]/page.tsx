@@ -299,12 +299,12 @@ function TrashIcon() {
   );
 }
 
-const backBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "var(--bg-elevated)", border: "1px solid var(--border)", color: "var(--text-secondary)", textDecoration: "none" };
-const btnSmall: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", cursor: "pointer", padding: 0 };
-const explorerRow: CSSProperties = { display: "flex", alignItems: "center", gap: 10, flex: 1, padding: "0.6rem 0.75rem", borderRadius: 8, textDecoration: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 500, transition: "background 0.1s", background: "transparent" };
+const backBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border)", color: "var(--text-secondary)", textDecoration: "none" };
+const btnSmall: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", cursor: "pointer", padding: 0 };
+const explorerRow: CSSProperties = { display: "flex", alignItems: "center", gap: 10, flex: 1, padding: "0.6rem 0.75rem", borderRadius: "var(--radius-sm)", textDecoration: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 500, transition: "background 0.1s", background: "transparent" };
 const btnAction: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", padding: "0.6rem 0.4rem", border: "none", background: "transparent", color: "var(--text-muted)", cursor: "pointer" };
-const btnAccent: CSSProperties = { padding: "0.55rem 1rem", borderRadius: 10, border: "none", background: "var(--accent)", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
-const btnDanger: CSSProperties = { padding: "0.55rem 1rem", borderRadius: 10, border: "none", background: "#dc2626", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
-const btnCancel: CSSProperties = { padding: "0.55rem 1rem", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", fontWeight: 500, cursor: "pointer", fontSize: 13 };
+const btnAccent: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "none", background: "var(--accent)", color: "#000", fontWeight: 600, cursor: "pointer", fontSize: 13 };
+const btnDanger: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "none", background: "#dc2626", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
+const btnCancel: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", fontWeight: 500, cursor: "pointer", fontSize: 13 };
 const overlayStyle: CSSProperties = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 200 };
-const dialogBoxStyle: CSSProperties = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 201, width: "min(90vw, 400px)", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: "1.5rem", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" };
+const dialogBoxStyle: CSSProperties = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 201, width: "min(90vw, 400px)", background: "var(--bg-card)", borderRadius: "var(--radius-lg)", padding: "1.5rem", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" };
