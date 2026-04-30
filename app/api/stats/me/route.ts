@@ -27,6 +27,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ok: true,
+      email: user.email ?? "",
       stats: {},
     });
   } catch (err) {

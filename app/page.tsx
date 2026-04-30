@@ -108,7 +108,7 @@ export default function StartPage() {
         >
           {busy ? "확인 중…" : "로그인"}
         </button>
-        <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", flexWrap: "wrap" }}>
           <Link
             href="/register"
             style={{
@@ -120,14 +120,24 @@ export default function StartPage() {
             회원가입
           </Link>
           <Link
-            href="/reset-pin"
+            href="/find-phone"
             style={{
               color: "var(--text-secondary)",
               fontSize: 14,
               textDecoration: "none",
             }}
           >
-            PIN 변경
+            전화번호 찾기
+          </Link>
+          <Link
+            href="/forgot-pin"
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: 14,
+              textDecoration: "none",
+            }}
+          >
+            PIN 찾기
           </Link>
         </div>
         {msg ? (

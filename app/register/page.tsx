@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
   const [busy, setBusy] = useState(false);
@@ -41,6 +42,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           name: nameTrim,
           phone,
+          email,
           pin,
           pinConfirm: pin2,
         }),
@@ -61,7 +63,7 @@ export default function RegisterPage() {
     } finally {
       setBusy(false);
     }
-  }, [name, phone, pin, pin2, router]);
+  }, [name, phone, email, pin, pin2, router]);
 
   return (
     <main
@@ -87,7 +89,7 @@ export default function RegisterPage() {
           회원가입
         </h1>
         <p style={{ margin: "0 0 1.25rem", color: "var(--text-secondary)", fontSize: 14 }}>
-          이름, 전화번호, PIN을 입력해 주세요.
+          이름, 전화번호, 이메일, PIN을 입력해 주세요.
         </p>
         <label style={lab}>
           이름
@@ -102,6 +104,17 @@ export default function RegisterPage() {
         <label style={lab}>
           전화번호
           <input value={phone} onChange={(e) => setPhone(e.target.value)} style={inp} />
+        </label>
+        <label style={lab}>
+          이메일
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            placeholder="example@email.com"
+            style={inp}
+          />
         </label>
         <label style={lab}>
           PIN (4자 이상)

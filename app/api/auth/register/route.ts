@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    let body: { name?: string; phone?: string; pin?: string; pinConfirm?: string };
+    let body: { name?: string; phone?: string; email?: string; pin?: string; pinConfirm?: string };
     try {
       body = await req.json();
     } catch {
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
 
     const nameRaw = typeof body.name === "string" ? body.name.trim() : "";
     const phone = typeof body.phone === "string" ? normalizePhone(body.phone) : "";
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const pin = typeof body.pin === "string" ? body.pin : "";
     const pinConfirm =
       typeof body.pinConfirm === "string" ? body.pinConfirm : pin;
@@ -34,6 +35,13 @@ export async function POST(req: Request) {
     if (nameRaw.length > 100) {
       return NextResponse.json(
         { ok: false, error: "이름은 100자 이하여야 합니다." },
+        { status: 400 },
+      );
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { ok: false, error: "올바른 이메일 주소를 입력해 주세요." },
         { status: 400 },
       );
     }
@@ -60,6 +68,7 @@ export async function POST(req: Request) {
     const user = await User.create({
       name,
       phone,
+      email,
       pin: hashed,
     });
 

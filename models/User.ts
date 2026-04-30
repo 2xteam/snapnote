@@ -4,7 +4,10 @@ const UserSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, index: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
     pin: { type: String, required: true },
+    pinResetToken: { type: String },
+    pinResetExpires: { type: Date },
     createdAt: { type: Date, default: Date.now },
     lastLoginAt: { type: Date },
   },
@@ -12,6 +15,7 @@ const UserSchema = new Schema(
 );
 
 UserSchema.index({ phone: 1, name: 1 });
+UserSchema.index({ email: 1 });
 
 export type UserDocument = InferSchemaType<typeof UserSchema> & {
   _id: mongoose.Types.ObjectId;

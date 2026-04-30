@@ -11,6 +11,7 @@ const nav = [
   { href: "/folders", label: "Folders" },
   { href: "/print", label: "Print" },
   { href: "/trash", label: "Trash" },
+  { href: "/inquiries", label: "Q&A" },
   { href: "/my", label: "My" },
 ];
 
