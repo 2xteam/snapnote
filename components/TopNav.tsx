@@ -10,7 +10,7 @@ const nav = [
   { href: "/home", label: "Home" },
   { href: "/folders", label: "Folders" },
   { href: "/print", label: "Print" },
-  { href: "/trash", label: "Trash" },
+  { href: "/events", label: "Event" },
   { href: "/inquiries", label: "Q&A" },
   { href: "/my", label: "My" },
 ];

@@ -70,6 +70,7 @@ export async function POST(req: Request) {
       phone,
       email,
       pin: hashed,
+      tokens: 20,
     });
 
     return NextResponse.json({

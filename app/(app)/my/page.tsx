@@ -15,6 +15,7 @@ export default function MyPage() {
   const [emailEditing, setEmailEditing] = useState(false);
   const [emailBusy, setEmailBusy] = useState(false);
   const [emailMsg, setEmailMsg] = useState<string | null>(null);
+  const [tokens, setTokens] = useState(0);
 
   const { themeId, custom, setTheme } = useTheme();
   const [customAccent, setCustomAccent] = useState(custom.accent);
@@ -31,8 +32,11 @@ export default function MyPage() {
     (async () => {
       try {
         const res = await fetch(`/api/stats/me?phone=${encodeURIComponent(session.phone)}&userId=${encodeURIComponent(session.id)}`);
-        const json = (await res.json()) as { ok: boolean; email?: string };
-        if (json.ok) setEmail(json.email ?? "");
+        const json = (await res.json()) as { ok: boolean; email?: string; tokens?: number };
+        if (json.ok) {
+          setEmail(json.email ?? "");
+          setTokens(json.tokens ?? 0);
+        }
       } catch { /* ignore */ }
     })();
   }, [session]);
@@ -117,6 +121,17 @@ export default function MyPage() {
               이메일 등록하기
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Token balance */}
+      <div style={{ padding: "1rem", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--accent-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+          🪙
+        </div>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2 }}>{tokens}</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>보유 토큰</div>
         </div>
       </div>
 

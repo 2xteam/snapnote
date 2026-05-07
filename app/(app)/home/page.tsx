@@ -44,7 +44,6 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: "1.5rem", minWidth: 0 }}>
-      <h1 style={{ margin: 0, fontSize: "1.3rem", color: "var(--text-primary)" }}>Home</h1>
 
       {!loaded ? (
         <p style={{ color: "var(--text-muted)", fontSize: 14 }}>로딩중입니다…</p>

@@ -6,6 +6,7 @@ const UserSchema = new Schema(
     phone: { type: String, required: true, index: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     pin: { type: String, required: true },
+    tokens: { type: Number, default: 0 },
     pinResetToken: { type: String },
     pinResetExpires: { type: Date },
     createdAt: { type: Date, default: Date.now },

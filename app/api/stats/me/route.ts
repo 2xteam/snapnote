@@ -28,6 +28,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       ok: true,
       email: user.email ?? "",
+      tokens: user.tokens ?? 0,
       stats: {},
     });
   } catch (err) {
