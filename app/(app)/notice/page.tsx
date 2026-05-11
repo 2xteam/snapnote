@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { loadSession, type SessionUser } from "@/lib/session";
 
 type Notice = {
@@ -24,10 +25,10 @@ type EventItem = {
 
 type Tab = "notice" | "event";
 
-export default function EventsPage() {
+export default function NoticePage() {
   const router = useRouter();
   const [session, setSession] = useState<SessionUser | null>(null);
-  const [tab, setTab] = useState<Tab>("event");
+  const [tab, setTab] = useState<Tab>("notice");
 
   const [notices, setNotices] = useState<Notice[]>([]);
   const [noticeLoading, setNoticeLoading] = useState(true);
@@ -96,7 +97,12 @@ export default function EventsPage() {
         setEventMsg((p) => ({ ...p, [eventId]: json.error ?? "참여에 실패했습니다." }));
         return;
       }
-      setEventMsg((p) => ({ ...p, [eventId]: `🎉 ${json.rewardTokens}토큰을 받았습니다!` }));
+      setEventMsg((p) => ({
+        ...p,
+        [eventId]: IS_TOKEN_SYSTEM_ENABLED
+          ? `🎉 ${json.rewardTokens}토큰을 받았습니다!`
+          : "참여가 완료되었습니다.",
+      }));
       setEventCode((p) => ({ ...p, [eventId]: "" }));
     } catch {
       setEventMsg((p) => ({ ...p, [eventId]: "네트워크 오류입니다." }));
@@ -109,10 +115,10 @@ export default function EventsPage() {
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
-      <h1 style={{ margin: 0, fontSize: "1.3rem", color: "var(--text-primary)" }}>Event</h1>
+      <h1 style={{ margin: 0, fontSize: "1.3rem", color: "var(--text-primary)" }}>Notice</h1>
 
       <div style={{ display: "flex", gap: 8 }}>
-        {(["event", "notice"] as Tab[]).map((t) => (
+        {(["notice", "event"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -198,9 +204,11 @@ export default function EventsPage() {
                       {ev.description}
                     </p>
                   )}
-                  <div style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, marginBottom: 8 }}>
-                    보상: {ev.rewardTokens} 토큰
-                  </div>
+                  {IS_TOKEN_SYSTEM_ENABLED && (
+                    <div style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, marginBottom: 8 }}>
+                      보상: {ev.rewardTokens} 토큰
+                    </div>
+                  )}
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <input
                       placeholder="코드 입력"

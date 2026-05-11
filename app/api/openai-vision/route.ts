@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isOpenAiApiKeyAuthError, isOpenAiKeyConfigured } from "@/lib/openaiKey";
 import { wrongItemsFromImage } from "@/lib/wrongNoteVision";
 import { readMultipartImage } from "@/lib/readMultipartImage";
+import { deductTokens } from "@/lib/useToken";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -17,6 +18,14 @@ export async function POST(req: Request) {
 
     const parsed = await readMultipartImage(req);
     if (!parsed.ok) return parsed.response;
+
+    const userId = parsed.userId ?? "";
+    if (userId) {
+      const tokenResult = await deductTokens(userId, 10);
+      if (!tokenResult.ok) {
+        return NextResponse.json({ ok: false, error: tokenResult.error }, { status: 402 });
+      }
+    }
 
     const problems = await wrongItemsFromImage(
       parsed.buffer,

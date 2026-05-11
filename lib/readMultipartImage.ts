@@ -4,7 +4,7 @@ import { normalizeRequestInstructions } from "@/lib/openaiInstructions";
 const MAX_BYTES = 8 * 1024 * 1024;
 
 export type ReadMultipartImageResult =
-  | { ok: true; buffer: Buffer; mimeType: string; instructions?: string }
+  | { ok: true; buffer: Buffer; mimeType: string; instructions?: string; userId?: string }
   | { ok: false; response: NextResponse };
 
 export async function readMultipartImage(
@@ -56,11 +56,14 @@ export async function readMultipartImage(
   }
 
   const instructions = normalizeRequestInstructions(formData.get("instructions"));
+  const userIdField = formData.get("userId");
+  const userId = typeof userIdField === "string" ? userIdField.trim() : undefined;
 
   return {
     ok: true,
     buffer: Buffer.from(arrayBuffer),
     mimeType: file.type?.trim() || "image/jpeg",
     ...(instructions ? { instructions } : {}),
+    ...(userId ? { userId } : {}),
   };
 }

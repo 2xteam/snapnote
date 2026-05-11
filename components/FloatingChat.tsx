@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { loadSession, type SessionUser } from "@/lib/session";
 
 type Thread = { _id: string; title: string; updatedAt: string };
@@ -25,12 +26,23 @@ export function FloatingChat() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const pendingMsg = useRef<string | null>(null);
 
   useEffect(() => {
     const s = loadSession();
     if (s) setSession(s);
+  }, []);
+
+  const refreshTokenBalance = useCallback(async (s: SessionUser) => {
+    if (!IS_TOKEN_SYSTEM_ENABLED) return;
+
+    try {
+      const res = await fetch(`/api/token-balance?userId=${encodeURIComponent(s.id)}`);
+      const json = (await res.json()) as { ok: boolean; tokens?: number };
+      if (json.ok) setTokenBalance(json.tokens ?? 0);
+    } catch { /* ignore */ }
   }, []);
 
   const loadThreads = useCallback(async (s: SessionUser) => {
@@ -71,6 +83,7 @@ export function FloatingChat() {
     let cancelled = false;
 
     (async () => {
+      await refreshTokenBalance(session);
       const res = await fetch(
         `/api/chat/threads?phone=${encodeURIComponent(session.phone)}&userId=${encodeURIComponent(session.id)}`,
       );
@@ -169,6 +182,7 @@ export function FloatingChat() {
       }
       await fetchMessages(session, threadId);
       await loadThreads(session);
+      await refreshTokenBalance(session);
     } catch {
       setMessages((m) =>
         m.filter((x) => x._id !== pendingUserId && x._id !== pendingAiId).concat([
@@ -406,24 +420,30 @@ export function FloatingChat() {
           </div>
 
           {/* Input */}
-          <div style={inputBarStyle}>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={busy ? "응답 대기 중…" : "메시지를 입력하세요…"}
-              disabled={busy}
-              style={{ flex: 1, fontSize: 13, opacity: busy ? 0.75 : 1, minWidth: 0 }}
-              onKeyDown={(e) => e.key === "Enter" && !busy && void send()}
-            />
-            <button
-              type="button"
-              disabled={busy || !input.trim()}
-              onClick={() => void send()}
-              style={{ ...sendBtnStyle, opacity: busy ? 0.85 : 1, cursor: busy ? "wait" : "pointer" }}
-            >
-              {busy ? "…" : <IconSend />}
-            </button>
-          </div>
+          {IS_TOKEN_SYSTEM_ENABLED && tokenBalance !== null && tokenBalance <= 0 ? (
+            <div style={{ ...inputBarStyle, justifyContent: "center", color: "var(--text-secondary)", fontSize: 13, fontWeight: 600 }}>
+              아쉽지만 토큰이 부족하여 진행하기 어렵습니다. 토큰을 충전해보세요!
+            </div>
+          ) : (
+            <div style={inputBarStyle}>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={busy ? "응답 대기 중…" : "메시지를 입력하세요…"}
+                disabled={busy}
+                style={{ flex: 1, fontSize: 13, opacity: busy ? 0.75 : 1, minWidth: 0 }}
+                onKeyDown={(e) => e.key === "Enter" && !busy && void send()}
+              />
+              <button
+                type="button"
+                disabled={busy || !input.trim()}
+                onClick={() => void send()}
+                style={{ ...sendBtnStyle, opacity: busy ? 0.85 : 1, cursor: busy ? "wait" : "pointer" }}
+              >
+                {busy ? "…" : <IconSend />}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>

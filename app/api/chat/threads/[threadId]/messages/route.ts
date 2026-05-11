@@ -10,6 +10,7 @@ import {
 } from "@/lib/openAiConversations";
 import { ChatThread, type ChatThreadDocument } from "@/models/ChatThread";
 import { getUserModel } from "@/models/User";
+import { deductTokens } from "@/lib/useToken";
 
 export const runtime = "nodejs";
 
@@ -144,6 +145,11 @@ export async function POST(
     const gate = await assertThread(threadId, phone, userId);
     if (!gate.ok) return gate.response;
     const thread = gate.thread;
+
+    const tokenResult = await deductTokens(userId, 1);
+    if (!tokenResult.ok) {
+      return NextResponse.json({ ok: false, error: tokenResult.error }, { status: 402 });
+    }
 
     let convId = (thread.openAiConversationId ?? "").trim();
     if (!convId) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { normalizePhone } from "@/lib/phone";
 import { getUserModel } from "@/models/User";
 
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
       phone,
       email,
       pin: hashed,
-      tokens: 20,
+      tokens: IS_TOKEN_SYSTEM_ENABLED ? 20 : 0,
     });
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { normalizePhone } from "@/lib/phone";
 import { getUserModel } from "@/models/User";
 
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       ok: true,
       email: user.email ?? "",
-      tokens: user.tokens ?? 0,
+      tokens: IS_TOKEN_SYSTEM_ENABLED ? user.tokens ?? 0 : 0,
       stats: {},
     });
   } catch (err) {

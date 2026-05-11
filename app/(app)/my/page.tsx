@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { PRESET_THEMES, type ThemeCustomColor, type ThemeId } from "@/lib/theme";
 import { loadSession, type SessionUser } from "@/lib/session";
 
@@ -125,15 +126,17 @@ export default function MyPage() {
       </div>
 
       {/* Token balance */}
-      <div style={{ padding: "1rem", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--accent-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-          🪙
+      {IS_TOKEN_SYSTEM_ENABLED && (
+        <div style={{ padding: "1rem", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--accent-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+            🪙
+          </div>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2 }}>{tokens}</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>보유 토큰</div>
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2 }}>{tokens}</div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>보유 토큰</div>
-        </div>
-      </div>
+      )}
 
       {/* Theme selector */}
       <div style={{ borderRadius: "var(--radius-lg)", background: "var(--bg-card)", overflow: "hidden" }}>

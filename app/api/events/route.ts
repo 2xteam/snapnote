@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { getEventModel, getApplicantModel } from "@/models/Event";
 import { getUserModel } from "@/models/User";
 
@@ -80,9 +81,14 @@ export async function POST(req: Request) {
       });
     }
 
-    await User.findByIdAndUpdate(userId, { $inc: { tokens: ev.rewardTokens } });
+    if (IS_TOKEN_SYSTEM_ENABLED) {
+      await User.findByIdAndUpdate(userId, { $inc: { tokens: ev.rewardTokens } });
+    }
 
-    return NextResponse.json({ ok: true, rewardTokens: ev.rewardTokens });
+    return NextResponse.json({
+      ok: true,
+      rewardTokens: IS_TOKEN_SYSTEM_ENABLED ? ev.rewardTokens : 0,
+    });
   } catch (err) {
     return NextResponse.json({ ok: false, error: err instanceof Error ? err.message : "오류" }, { status: 500 });
   }
