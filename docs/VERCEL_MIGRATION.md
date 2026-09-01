@@ -67,6 +67,9 @@ SnapNote는 업로드 경로가 두 개였다.
 ## 2. Vercel 프로젝트 설정
 
 1. **Import**: Vercel → Add New → Project → `2xteam/snapnote`
+   - ⚠️ **이 저장소의 기본 브랜치는 `main`이 아니라 `master`다.**
+     Vercel의 Production Branch가 `master`로 설정되었는지 확인할 것
+     (Settings → Git → Production Branch)
 2. **Node.js Version 22.x** (v22 미만은 `File` 글로벌이 없어 업로드가 502로 실패)
 3. **Environment Variables** — ⚠️ **Deploy 누르기 전에** 전부 입력한다.
    나중에 추가하면 기존 배포에는 반영되지 않아 재배포가 필요하다.

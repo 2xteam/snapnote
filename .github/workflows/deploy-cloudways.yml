@@ -10,11 +10,11 @@
 #
 # 소스만 서버로 전송 → 서버에서 npm ci + build + PM2 reload
 
-name: Deploy to Cloudways
+name: Deploy to Cloudways (비활성 — Vercel로 이관됨)
 
+# 2026-09-01 Vercel 이관으로 자동 배포를 중단했다.
+# Cloudways로 롤백이 필요하면 Actions 탭에서 수동 실행한다.
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 concurrency:
