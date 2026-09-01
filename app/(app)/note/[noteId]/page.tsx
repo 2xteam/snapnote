@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { loadSession, type SessionUser } from "@/lib/session";
 import { ImageCropper, type CropResult } from "@/components/ImageCropper";
 import { MonoAdjust, type MonoResult } from "@/components/MonoAdjust";
+import { checkUploadSize } from "@/lib/clientImage";
 
 type NoteInfo = { _id: string; name: string; folderId?: string };
 type ItemRow = { _id: string; imageUrl: string };
@@ -86,6 +87,12 @@ export default function NoteDetailPage() {
     setBusy("saving");
     setMsg(null);
     try {
+      const sizeCheck = checkUploadSize(file);
+      if (!sizeCheck.ok) {
+        setMsg(sizeCheck.error);
+        return;
+      }
+
       const fd = new FormData();
       fd.set("file", file);
       fd.set("phone", session.phone);

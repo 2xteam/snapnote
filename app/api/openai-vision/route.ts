@@ -5,7 +5,8 @@ import { readMultipartImage } from "@/lib/readMultipartImage";
 import { deductTokens } from "@/lib/useToken";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+// Hobby 플랜 상한이 60초다. Pro로 올린 뒤에는 늘려도 된다.
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {

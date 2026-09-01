@@ -4,6 +4,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getR2Client, getR2Bucket, getR2PublicUrl } from "@/lib/r2";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
@@ -21,10 +22,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "이미지 파일만 업로드 가능합니다." }, { status: 400 });
     }
 
-    const MAX = 10 * 1024 * 1024;
+    // Vercel Functions는 본문 4.5MB를 넘으면 함수에 닿기도 전에 잘린다.
+    // 클라이언트가 업로드 전에 해상도를 제한한다(`lib/clientImage.ts`).
+    const MAX = 4 * 1024 * 1024;
     const arrayBuffer = await file.arrayBuffer();
     if (arrayBuffer.byteLength > MAX) {
-      return NextResponse.json({ ok: false, error: "파일이 너무 큽니다. (최대 10MB)" }, { status: 413 });
+      return NextResponse.json({
+          ok: false,
+          error:
+            "이미지 용량이 너무 큽니다. (최대 4MB) 사진을 다시 촬영하거나 영역을 좁혀서 시도해 주세요.",
+        }, { status: 413 });
     }
 
     const phone = (formData.get("phone") as string | null)?.trim() ?? "";

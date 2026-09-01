@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { normalizeRequestInstructions } from "@/lib/openaiInstructions";
 
-const MAX_BYTES = 8 * 1024 * 1024;
+/** Vercel Functions 본문 제한(4.5MB) 아래로 맞춘 값 */
+const MAX_BYTES = 4 * 1024 * 1024;
 
 export type ReadMultipartImageResult =
   | { ok: true; buffer: Buffer; mimeType: string; instructions?: string; userId?: string }
@@ -49,7 +50,10 @@ export async function readMultipartImage(
     return {
       ok: false,
       response: NextResponse.json(
-        { ok: false, error: "파일이 너무 큽니다. (최대 8MB)" },
+        {
+          ok: false,
+          error: "이미지 용량이 너무 큽니다. (최대 4MB)",
+        },
         { status: 413 },
       ),
     };

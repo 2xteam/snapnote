@@ -7,8 +7,14 @@ import {
   useCallback,
   type CSSProperties,
 } from "react";
+import {
+  NOTE_IMAGE_FALLBACK_EDGES,
+  UPLOAD_RETRY_THRESHOLD_BYTES,
+  canvasToBlob,
+  fitInside,
+} from "@/lib/clientImage";
 
-export type MonoResult = { file: File; dataUrl: string };
+export type MonoResult = { file: File; dataUrl?: string };
 
 interface Props {
   imageSrc: string;
@@ -20,12 +26,20 @@ function applyMono(
   src: HTMLImageElement,
   canvas: HTMLCanvasElement,
   threshold: number,
+  maxEdge: number,
 ) {
-  const w = src.naturalWidth;
-  const h = src.naturalHeight;
+  // 이진화된 PNG는 잡음이 많을수록 커진다. 해상도를 제한해 업로드 본문
+  // 제한(4.5MB) 아래로 유지한다.
+  const { width: w, height: h } = fitInside(
+    src.naturalWidth,
+    src.naturalHeight,
+    maxEdge,
+  );
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(src, 0, 0, w, h);
   const imageData = ctx.getImageData(0, 0, w, h);
   const d = imageData.data;
@@ -90,20 +104,22 @@ export function MonoAdjust({ imageSrc, onConfirm, onCancel }: Props) {
     pCtx.putImageData(imageData, 0, 0);
   }, [imgLoaded, threshold]);
 
-  const doConfirm = () => {
+  const doConfirm = async () => {
     if (!imgRef.current) return;
     const canvas = canvasRef.current ?? document.createElement("canvas");
-    applyMono(imgRef.current, canvas, threshold);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const file = new File([blob], "mono.png", { type: "image/png" });
-        const dataUrl = canvas.toDataURL("image/png");
-        onConfirm({ file, dataUrl });
-      },
-      "image/png",
-      0.95,
-    );
+
+    // 이진화 결과가 기준보다 크면 해상도를 한 단계씩 낮춰 다시 인코딩한다.
+    let blob: Blob | null = null;
+    for (const edge of NOTE_IMAGE_FALLBACK_EDGES) {
+      applyMono(imgRef.current, canvas, threshold, edge);
+      blob = await canvasToBlob(canvas, "image/png");
+      if (!blob) return;
+      if (blob.size <= UPLOAD_RETRY_THRESHOLD_BYTES) break;
+    }
+    if (!blob) return;
+
+    // dataUrl은 호출부에서 사용하지 않는다(큰 base64 문자열을 만들지 않음).
+    onConfirm({ file: new File([blob], "mono.png", { type: "image/png" }) });
   };
 
   return (
@@ -145,7 +161,7 @@ export function MonoAdjust({ imageSrc, onConfirm, onCancel }: Props) {
 
           <canvas ref={canvasRef} style={{ display: "none" }} />
 
-          <button type="button" onClick={doConfirm} style={confirmBtnStyle}>
+          <button type="button" onClick={() => void doConfirm()} style={confirmBtnStyle}>
             ✓ 이 설정으로 저장
           </button>
         </>

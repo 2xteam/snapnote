@@ -13,6 +13,8 @@ import { getUserModel } from "@/models/User";
 import { deductTokens } from "@/lib/useToken";
 
 export const runtime = "nodejs";
+// OpenAI 응답 지연 대비 (Vercel 기본값은 플랜에 따라 10~15초)
+export const maxDuration = 60;
 
 type ChatThreadHydrated = HydratedDocument<ChatThreadDocument>;
 

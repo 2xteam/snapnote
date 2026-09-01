@@ -7,6 +7,7 @@ import {
   useCallback,
   type CSSProperties,
 } from "react";
+import { NOTE_IMAGE_MAX_EDGE, fitInside } from "@/lib/clientImage";
 
 export type CropResult = { file: File; dataUrl: string };
 
@@ -191,11 +192,16 @@ export function ImageCropper({ imageSrc, onCrop, onCancel }: Props) {
     const sw = Math.round(crop.w * scaleX);
     const sh = Math.round(crop.h * scaleY);
 
+    // 업로드 본문 제한(4.5MB)과 모바일 메모리를 고려해 긴 변을 제한한다.
+    const { width: dw, height: dh } = fitInside(sw, sh, NOTE_IMAGE_MAX_EDGE);
+
     const canvas = document.createElement("canvas");
-    canvas.width = sw;
-    canvas.height = sh;
+    canvas.width = dw;
+    canvas.height = dh;
     const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(imgRef.current, sx, sy, sw, sh, 0, 0, sw, sh);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(imgRef.current, sx, sy, sw, sh, 0, 0, dw, dh);
 
     canvas.toBlob(
       (blob) => {
