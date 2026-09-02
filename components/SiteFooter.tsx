@@ -27,7 +27,7 @@ const wrapStyle: CSSProperties = {
   paddingTop: "1.5rem",
   paddingBottom: "0.5rem",
   borderTop: "1px solid var(--border-subtle)",
-  textAlign: "center",
+  textAlign: "left",
 };
 
 const descStyle: CSSProperties = {
