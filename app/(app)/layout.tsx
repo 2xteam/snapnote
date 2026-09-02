@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { TopNav } from "@/components/TopNav";
 import { FloatingChat } from "@/components/FloatingChat";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function AppShellLayout({
   children,
@@ -17,6 +18,7 @@ export default function AppShellLayout({
           }}
         >
           {children}
+          <SiteFooter />
         </div>
         <FloatingChat />
       </div>
