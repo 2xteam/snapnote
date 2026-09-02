@@ -1,7 +1,6 @@
 /* ── Theme Variables — SETLOG-inspired ── */
-/* 기본(fallback)은 다크 테마. data-theme 속성으로 전환됩니다. */
+/* 기본(fallback)은 퍼플 테마. data-theme 속성으로 전환됩니다. */
 
-:root,
 [data-theme="dark"] {
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
@@ -71,29 +70,32 @@
   --chat-btn-color: var(--accent);
 }
 
-/* ── Violet Theme → Neon Pink ── */
+/* ── Purple Theme (기본) ──
+ * FitLog와 같은 보라 계열. 예전 네온핑크를 대체한다.
+ * `:root` 도 이 값을 쓰므로 첫 페인트가 기본 테마와 일치한다. */
+:root,
 [data-theme="violet"] {
-  --bg-primary: #050008;
-  --bg-secondary: #0d0812;
-  --bg-card: #1a1020;
-  --bg-elevated: #25182e;
-  --border: rgba(255, 78, 205, 0.12);
-  --border-subtle: rgba(255, 78, 205, 0.06);
-  --text-primary: #f8f0ff;
-  --text-secondary: #cc88ee;
-  --text-muted: #7a4a99;
-  --accent: #ff4ecd;
-  --accent-hover: #e63baf;
-  --accent-subtle: rgba(255, 78, 205, 0.14);
-  --point: #2ee8ae;
-  --point-subtle: rgba(46, 232, 174, 0.12);
-  --danger: #ff6b8a;
-  --danger-subtle: rgba(255, 107, 138, 0.12);
-  --success: #2ee8ae;
-  --success-subtle: rgba(46, 232, 174, 0.12);
-  --warning: #ffc233;
-  --input-bg: #1a1020;
-  --input-border: rgba(255, 78, 205, 0.18);
+  --bg-primary: #190527;
+  --bg-secondary: #1e0938;
+  --bg-card: #2d1054;
+  --bg-elevated: #3a1760;
+  --border: rgba(196, 181, 253, 0.18);
+  --border-subtle: rgba(196, 181, 253, 0.08);
+  --text-primary: #f6f1fb;
+  --text-secondary: #b0a3cd;
+  --text-muted: #8577a8;
+  --accent: #a78bfa;
+  --accent-hover: #b9a3fb;
+  --accent-subtle: rgba(167, 139, 250, 0.16);
+  --point: #e8c96a;
+  --point-subtle: rgba(232, 201, 106, 0.14);
+  --danger: #ff7a90;
+  --danger-subtle: rgba(255, 122, 144, 0.14);
+  --success: #7ee0b8;
+  --success-subtle: rgba(126, 224, 184, 0.14);
+  --warning: #ead58c;
+  --input-bg: rgba(255, 255, 255, 0.04);
+  --input-border: rgba(196, 181, 253, 0.2);
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
@@ -101,9 +103,9 @@
   --radius-full: 9999px;
   --nav-height: 56px;
   --nav-top: 0px;
-  --chat-fab-bg: #ff4ecd;
-  --chat-fab-fg: #ffffff;
-  --chat-btn-color: #ff4ecd;
+  --chat-fab-bg: var(--accent);
+  --chat-fab-fg: #21083f;
+  --chat-btn-color: var(--accent);
 }
 
 /* ── Custom Theme (CSS 변수는 ThemeProvider에서 인라인 style로 주입) ── */
@@ -571,9 +573,21 @@ a:hover {
   color: var(--accent);
 }
 
+/* 접힌 메뉴의 Logout — 위 링크들과 같은 줄 높이·정렬로 맞춘다.
+   버튼이라 폰트·배경·정렬을 명시해야 링크와 같아진다. */
 .topnav-menu-logout {
-  margin-top: 0.75rem;
-  width: fit-content;
+  width: 100%;
+  border: none;
+  border-bottom: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.topnav-menu-logout:hover {
+  color: var(--danger);
 }
 
 /* Click-away backdrop */

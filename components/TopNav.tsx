@@ -171,7 +171,7 @@ export function TopNav() {
               </Link>
             );
           })}
-          <button type="button" onClick={() => { setOpen(false); logout(); }} className="topnav-logout topnav-menu-logout">Logout</button>
+          <button type="button" onClick={() => { setOpen(false); logout(); }} className="topnav-menu-link topnav-menu-logout">Logout</button>
         </div>
       </nav>
     </>

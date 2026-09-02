@@ -28,9 +28,9 @@ export const PRESET_THEMES: ThemeConfig[] = [
   },
   {
     id: "violet",
-    label: "네온핑크",
+    label: "퍼플",
     dataAttr: "violet",
-    preview: { bg: "#050008", accent: "#ff4ecd", text: "#f8f0ff" },
+    preview: { bg: "#190527", accent: "#a78bfa", text: "#f6f1fb" },
   },
   {
     id: "custom",
@@ -40,21 +40,24 @@ export const PRESET_THEMES: ThemeConfig[] = [
   },
 ];
 
+/** 저장된 선택이 없을 때 쓰는 테마. globals.css 의 `:root` 값과 같아야 한다. */
+export const DEFAULT_THEME: ThemeId = "violet";
+
 const STORAGE_KEY = "snapnote_theme";
 
 type StoredTheme = { id: ThemeId; custom?: ThemeCustomColor };
 
 export function loadTheme(): StoredTheme {
-  if (typeof window === "undefined") return { id: "dark" };
+  if (typeof window === "undefined") return { id: DEFAULT_THEME };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { id: "dark" };
+    if (!raw) return { id: DEFAULT_THEME };
     const parsed = JSON.parse(raw) as Partial<StoredTheme>;
     const validIds: ThemeId[] = ["dark", "light", "violet", "custom"];
-    if (!validIds.includes(parsed.id as ThemeId)) return { id: "dark" };
+    if (!validIds.includes(parsed.id as ThemeId)) return { id: DEFAULT_THEME };
     return { id: parsed.id as ThemeId, custom: parsed.custom };
   } catch {
-    return { id: "dark" };
+    return { id: DEFAULT_THEME };
   }
 }
 
