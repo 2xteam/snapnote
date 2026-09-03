@@ -842,3 +842,25 @@ a[style*="var(--bg-card)"]:hover {
 [data-theme="custom"] .myjane-mark > span {
   color: #8b5cf6;
 }
+
+/* 채팅 빈 화면 — 무엇을 물어볼 수 있는지 예시 칩 */
+.chat-suggestion {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.chat-suggestion:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--accent);
+}

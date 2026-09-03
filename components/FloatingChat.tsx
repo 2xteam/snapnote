@@ -26,6 +26,8 @@ export function FloatingChat() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  /** 스레드를 불러오는 중 — 안내 문구가 깜빡이지 않게 한다 */
+  const [hydrating, setHydrating] = useState(false);
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const pendingMsg = useRef<string | null>(null);
@@ -55,12 +57,20 @@ export function FloatingChat() {
 
   const fetchMessages = useCallback(
     async (s: SessionUser, threadId: string) => {
-      const res = await fetch(
-        `/api/chat/threads/${threadId}/messages?phone=${encodeURIComponent(s.phone)}&userId=${encodeURIComponent(s.id)}`,
-      );
-      const json = (await res.json()) as { ok: boolean; items?: Msg[] };
-      if (json.ok && json.items) setMessages(json.items);
-      else setMessages([]);
+      // 불러오는 동안에는 빈 화면 안내를 띄우지 않는다 (이력이 있는데 깜빡인다)
+      setHydrating(true);
+      try {
+        const res = await fetch(
+          `/api/chat/threads/${threadId}/messages?phone=${encodeURIComponent(s.phone)}&userId=${encodeURIComponent(s.id)}`,
+        );
+        const json = (await res.json()) as { ok: boolean; items?: Msg[] };
+        if (json.ok && json.items) setMessages(json.items);
+        else setMessages([]);
+      } catch {
+        setMessages([]);
+      } finally {
+        setHydrating(false);
+      }
     },
     [],
   );
@@ -81,6 +91,7 @@ export function FloatingChat() {
   useEffect(() => {
     if (!session || !open) return;
     let cancelled = false;
+    setHydrating(true);
 
     (async () => {
       await refreshTokenBalance(session);
@@ -108,7 +119,9 @@ export function FloatingChat() {
         setActive(DRAFT_ID);
         setMessages([]);
       }
-    })();
+    })().finally(() => {
+      if (!cancelled) setHydrating(false);
+    });
 
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -289,10 +302,8 @@ export function FloatingChat() {
           <div style={{ flex: 1, minHeight: 0, display: "flex", position: "relative", overflow: "hidden" }}>
             {/* Messages */}
             <div style={messagesContainerStyle}>
-              {messages.length === 0 && active === DRAFT_ID ? (
-                <div style={{ flex: "1 1 auto", minHeight: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <p style={{ color: "var(--text-muted)", fontSize: 13 }}>메시지를 입력하여 대화를 시작하세요.</p>
-                </div>
+              {messages.length === 0 && !hydrating ? (
+                <EmptyGuide onPick={(q) => void sendText(q)} />
               ) : (
                 messages.map((m) => {
                   const isPendingAi = m._id.startsWith("local-ai-") && busy;
@@ -447,6 +458,63 @@ export function FloatingChat() {
         </div>
       )}
     </>
+  );
+}
+
+/* ── 빈 화면 안내 ── */
+
+/** 무엇을 물어볼 수 있는지 대화처럼 먼저 보여준다 */
+const SUGGESTIONS = [
+  "이 문제 푸는 순서를 단계로 알려줘",
+  "왜 이 답이 틀렸는지 설명해줘",
+  "이 유형과 비슷한 연습 문제 만들어줘",
+  "자주 틀리는 유형은 어떻게 복습해야 해?",
+  "오답노트를 잘 쓰는 방법 알려줘",
+];
+
+function EmptyGuide({ onPick }: { onPick: (q: string) => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 4 }}>
+      <GuideBubble text="안녕하세요, **SnapNote 오답 도우미**예요. 오답노트에 담은 문제를 어떻게 다시 풀지 같이 정리해 드려요." />
+      <GuideBubble text="이런 걸 물어볼 수 있어요 👇" />
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
+        {SUGGESTIONS.map((q) => (
+          <button
+            key={q}
+            type="button"
+            className="chat-suggestion"
+            onClick={() => onPick(q)}
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      <p style={{ margin: "4px 0 0", fontSize: 11.5, color: "var(--text-muted)" }}>
+        눌러서 바로 물어보거나, 아래에 직접 입력해도 돼요.
+      </p>
+    </div>
+  );
+}
+
+function GuideBubble({ text }: { text: string }) {
+  return (
+    <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", flexShrink: 0 }}>
+      <div
+        className="chat-md"
+        style={{
+          maxWidth: "88%",
+          padding: "0.45rem 0.65rem",
+          borderRadius: "10px 10px 10px 3px",
+          background: "var(--bg-elevated)",
+          color: "var(--text-primary)",
+          fontSize: 13,
+        }}
+      >
+        <Markdown>{text}</Markdown>
+      </div>
+    </div>
   );
 }
 
