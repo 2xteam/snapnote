@@ -238,7 +238,7 @@ export default function NoteDetailPage() {
 }
 
 const headerBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border)", color: "var(--text-secondary)", textDecoration: "none", cursor: "pointer" };
-const actionBtn: CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, padding: "0.6rem 1.2rem", borderRadius: "var(--radius-sm)", background: "var(--accent)", color: "#000", textDecoration: "none", fontSize: 14, fontWeight: 600 };
+const actionBtn: CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, padding: "0.6rem 1.2rem", borderRadius: "var(--radius-sm)", background: "var(--accent)", color: "var(--on-accent)", textDecoration: "none", fontSize: 14, fontWeight: 600 };
 const cardStyle: CSSProperties = { borderRadius: "var(--radius-lg)", padding: "0.75rem", background: "var(--bg-card)", overflow: "hidden" };
 const cardDeleteBtn: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "var(--radius-sm)", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#fca5a5", cursor: "pointer", padding: 0 };
 const btnCancel: CSSProperties = { padding: "0.55rem 1rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text-secondary)", fontWeight: 500, cursor: "pointer", fontSize: 13 };

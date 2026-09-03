@@ -1,5 +1,4 @@
 import { AuthGate } from "@/components/AuthGate";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { TopNav } from "@/components/TopNav";
 import { FloatingChat } from "@/components/FloatingChat";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -9,7 +8,6 @@ export default function AppShellLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ThemeProvider>
       <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
         <TopNav />
         <div
@@ -24,6 +22,5 @@ export default function AppShellLayout({
         </div>
         <FloatingChat />
       </div>
-    </ThemeProvider>
   );
 }

@@ -225,7 +225,7 @@ export default function NoticePage() {
                         borderRadius: "var(--radius-sm)",
                         border: "none",
                         background: eventBusy === ev.id ? "var(--text-muted)" : "var(--accent)",
-                        color: "#000",
+                        color: "var(--on-accent)",
                         fontWeight: 600,
                         fontSize: 14,
                         cursor: eventBusy === ev.id ? "default" : "pointer",

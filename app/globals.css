@@ -1,28 +1,13 @@
-/* ── Theme Variables — SETLOG-inspired ── */
-/* 기본(fallback)은 퍼플 테마. data-theme 속성으로 전환됩니다. */
+/* ── 색 토큰 — 결쩜사(kyulzzumsa.co.kr) 라이트 ──
+ * 이 앱은 **테마가 하나뿐이다.** 선택 UI도, `data-theme` 속성도 없다.
+ * 값은 fitlog · 2hbk 의 라이트와 똑같이 맞춘다 — 앱을 오갈 때 밝기가 바뀌지 않도록.
+ *
+ * 색을 직접 쓰지 말고 항상 이 변수를 참조한다.
+ * 근거: my-obsidian-vault → 20-Design/앱 공통 UI와 아이콘.md
+ * ── */
 
-[data-theme="dark"] {
-  --bg-primary: #000000;
-  --bg-secondary: #0a0a0a;
-  --bg-card: #1a1a1a;
-  --bg-elevated: #252525;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --text-primary: #ffffff;
-  --text-secondary: #999999;
-  --text-muted: #555555;
-  --accent: #2ee8ae;
-  --accent-hover: #22d49e;
-  --accent-subtle: rgba(46, 232, 174, 0.12);
-  --point: #ff4ecd;
-  --point-subtle: rgba(255, 78, 205, 0.12);
-  --danger: #ff4e6a;
-  --danger-subtle: rgba(255, 78, 106, 0.12);
-  --success: #2ee8ae;
-  --success-subtle: rgba(46, 232, 174, 0.12);
-  --warning: #ffc233;
-  --input-bg: #1a1a1a;
-  --input-border: rgba(255, 255, 255, 0.1);
+:root {
+  /* 구조 */
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
@@ -30,96 +15,31 @@
   --radius-full: 9999px;
   --nav-height: 56px;
   --nav-top: 0px;
-  --chat-fab-bg: var(--accent);
-  --chat-fab-fg: #ffffff;
-  --chat-btn-color: var(--accent);
-}
 
-/* ── Light Theme ── */
-[data-theme="light"] {
-  --bg-primary: #f2f2f7;
-  --bg-secondary: #e8e8ed;
+  /* 색 */
+  --bg-primary: #fdfbff;
+  --bg-secondary: #f5f0fc;
   --bg-card: #ffffff;
-  --bg-elevated: #f7f7fa;
-  --border: rgba(0, 0, 0, 0.06);
-  --border-subtle: rgba(0, 0, 0, 0.03);
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --text-muted: #aaaaaa;
-  --accent: #1ab485;
-  --accent-hover: #15a078;
-  --accent-subtle: rgba(26, 180, 133, 0.1);
-  --point: #e63baf;
-  --point-subtle: rgba(230, 59, 175, 0.1);
-  --danger: #e63b5a;
-  --danger-subtle: rgba(230, 59, 90, 0.1);
-  --success: #1ab485;
-  --success-subtle: rgba(26, 180, 133, 0.1);
-  --warning: #e6a800;
+  --bg-elevated: #ffffff;
+  --border: rgba(139, 92, 246, 0.14);
+  --border-subtle: rgba(139, 92, 246, 0.08);
+  --text-primary: #1a0f2e;
+  --text-secondary: #6b5f8a;
+  --text-muted: #786b9c;
+  --accent: #7c3aed;
+  --accent-hover: #6830c8;
+  --accent-subtle: rgba(139, 92, 246, 0.08);
+  --point: #c9a84c;
+  --point-subtle: rgba(201, 168, 76, 0.12);
+  --danger: #e0455f;
+  --danger-subtle: rgba(224, 69, 95, 0.1);
+  --success: #2f9e74;
+  --success-subtle: rgba(47, 158, 116, 0.12);
+  --warning: #c9a84c;
   --input-bg: #ffffff;
-  --input-border: rgba(0, 0, 0, 0.1);
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
-  --nav-height: 56px;
-  --nav-top: 0px;
-  --chat-fab-bg: var(--accent);
-  --chat-fab-fg: #ffffff;
-  --chat-btn-color: var(--accent);
-}
-
-/* ── Purple Theme (기본) ──
- * FitLog와 같은 보라 계열. 예전 네온핑크를 대체한다.
- * `:root` 도 이 값을 쓰므로 첫 페인트가 기본 테마와 일치한다. */
-:root,
-[data-theme="violet"] {
-  --bg-primary: #190527;
-  --bg-secondary: #1e0938;
-  --bg-card: #2d1054;
-  --bg-elevated: #3a1760;
-  --border: rgba(196, 181, 253, 0.18);
-  --border-subtle: rgba(196, 181, 253, 0.08);
-  --text-primary: #f6f1fb;
-  --text-secondary: #b0a3cd;
-  --text-muted: #8577a8;
-  --accent: #a78bfa;
-  --accent-hover: #b9a3fb;
-  --accent-subtle: rgba(167, 139, 250, 0.16);
-  --point: #e8c96a;
-  --point-subtle: rgba(232, 201, 106, 0.14);
-  --danger: #ff7a90;
-  --danger-subtle: rgba(255, 122, 144, 0.14);
-  --success: #7ee0b8;
-  --success-subtle: rgba(126, 224, 184, 0.14);
-  --warning: #ead58c;
-  --input-bg: rgba(255, 255, 255, 0.04);
-  --input-border: rgba(196, 181, 253, 0.2);
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
-  --nav-height: 56px;
-  --nav-top: 0px;
-  --chat-fab-bg: var(--accent);
-  --chat-fab-fg: #21083f;
-  --chat-btn-color: var(--accent);
-}
-
-/* ── Custom Theme (CSS 변수는 ThemeProvider에서 인라인 style로 주입) ── */
-[data-theme="custom"] {
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
-  --nav-height: 56px;
-  --nav-top: 0px;
-  --chat-fab-bg: var(--accent);
-  --chat-fab-fg: #ffffff;
-  --chat-btn-color: var(--accent);
+  --input-border: rgba(72, 42, 97, 0.14);
+  --gold: #c9a84c;
+  --on-accent: #ffffff;
 }
 
 * {
@@ -834,14 +754,10 @@ a[style*="var(--bg-card)"]:hover {
   color: #a78bfa;
 }
 
-[data-theme="light"] .myjane-mark > span {
+.myjane-mark > span {
   color: #7c3aed;
 }
 
-/* custom 테마는 배경을 미리 알 수 없어 양쪽에서 읽히는 중간 톤을 쓴다 */
-[data-theme="custom"] .myjane-mark > span {
-  color: #8b5cf6;
-}
 
 /* 채팅 빈 화면 — 무엇을 물어볼 수 있는지 예시 칩 */
 .chat-suggestion {

@@ -72,5 +72,5 @@ const lab: CSSProperties = { display: "grid", gap: 6, marginBottom: "0.85rem", f
 const inp: CSSProperties = { padding: "0.65rem 0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--input-border)", background: "var(--input-bg)", color: "var(--text-primary)", fontSize: 16 };
 const linkStyle: CSSProperties = { display: "block", textAlign: "center", color: "var(--accent)", fontSize: 14, textDecoration: "none" };
 function btnStyle(busy: boolean): CSSProperties {
-  return { width: "100%", marginTop: "0.5rem", padding: "0.85rem", borderRadius: "var(--radius-sm)", border: "none", background: busy ? "var(--text-muted)" : "var(--accent)", color: "#000", fontWeight: 600, cursor: busy ? "default" : "pointer" };
+  return { width: "100%", marginTop: "0.5rem", padding: "0.85rem", borderRadius: "var(--radius-sm)", border: "none", background: busy ? "var(--text-muted)" : "var(--accent)", color: "var(--on-accent)", fontWeight: 600, cursor: busy ? "default" : "pointer" };
 }

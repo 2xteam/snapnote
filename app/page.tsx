@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { AppIcon } from "@/components/AppIcon";
 import { LandingCta, LandingHeaderAuth } from "@/components/LandingAuth";
 import { Sheet } from "@/components/Sheet";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
 /**
  * 소개 페이지 — 루트(`/`).
@@ -17,7 +16,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
  */
 export default function LandingPage() {
   return (
-    <ThemeProvider>
       <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
         <header style={headerStyle}>
           <div className="page" style={{ ...headerInner, paddingTop: 14, paddingBottom: 14 }}>
@@ -106,7 +104,6 @@ export default function LandingPage() {
           </div>
         </footer>
       </div>
-    </ThemeProvider>
   );
 }
 

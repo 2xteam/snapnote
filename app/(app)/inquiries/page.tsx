@@ -323,7 +323,7 @@ function submitBtnStyle(b: boolean): CSSProperties {
     borderRadius: "var(--radius-sm)",
     border: "none",
     background: b ? "var(--text-muted)" : "var(--accent)",
-    color: "#000",
+    color: "var(--on-accent)",
     fontWeight: 600,
     fontSize: 15,
     cursor: b ? "default" : "pointer",
