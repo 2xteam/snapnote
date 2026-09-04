@@ -24,6 +24,7 @@
 
 ## 이 프로젝트 메모
 
+- 관리 화면은 **포털**에 있다(`www.myjane.co.kr/admin`). 여기엔 `/api/admin/*` 만 둔다 → `30-Patterns/통합 admin.md`
 - **기본 브랜치가 `master`다** (main 아님). Vercel Production Branch도 master
 - 이미지 업로드는 `30-Patterns/이미지 업로드 패턴.md`의 **③ 생성 단계에서 해상도 제한** 방식
 - 회원은 `user` DB 공유
