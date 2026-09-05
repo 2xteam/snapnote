@@ -25,6 +25,12 @@ export function FloatingChat() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  /** 서버가 지금 무엇을 하고 있는지 — 첫 글자가 오기 전까지 보여준다 */
+  const [stage, setStage] = useState<string | null>(null);
+  /** 이어서 물어볼 것 — 서버에서 받아온다 */
+  const [chips, setChips] = useState<string[]>([]);
+  /** 모델이 되물었을 때 — 사용자가 고를 때까지 여기 머문다 */
+  const [ask, setAsk] = useState<{ callId: string; question: string; options: string[] } | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   /** 스레드를 불러오는 중 — 안내 문구가 깜빡이지 않게 한다 */
   const [hydrating, setHydrating] = useState(false);
@@ -45,6 +51,17 @@ export function FloatingChat() {
       const json = (await res.json()) as { ok: boolean; tokens?: number };
       if (json.ok) setTokenBalance(json.tokens ?? 0);
     } catch { /* ignore */ }
+  }, []);
+
+  /** 제안 칩. 실패해도 대화는 그대로 쓸 수 있어야 하니 조용히 넘어간다 */
+  const loadChips = useCallback(async (started: boolean) => {
+    try {
+      const res = await fetch(`/api/chat/suggestions?started=${started ? "1" : "0"}`);
+      const json = (await res.json()) as { ok: boolean; chips?: Array<{ text: string }> };
+      if (json.ok && json.chips) setChips(json.chips.map((c) => c.text));
+    } catch {
+      /* 제안은 있으면 좋은 것이지 없으면 안 되는 것이 아니다 */
+    }
   }, []);
 
   const loadThreads = useCallback(async (s: SessionUser) => {
@@ -102,6 +119,7 @@ export function FloatingChat() {
       if (cancelled) return;
       const list = json.ok && json.items ? json.items : [];
       setThreads(list);
+      void loadChips(list.length > 0);
 
       if (pendingMsg.current) {
         const msg = pendingMsg.current;
@@ -138,10 +156,12 @@ export function FloatingChat() {
     setHistoryOpen(false);
   };
 
-  const sendText = useCallback(async (textOverride?: string) => {
+  const sendText = useCallback(async (textOverride?: string, answerTo?: string) => {
     const text = textOverride ?? input.trim();
     if (!session || !text) return;
     if (!textOverride) setInput("");
+    // 새 질문을 보내면 앞의 되묻기는 접는다
+    setAsk(null);
 
     let threadId = active;
 
@@ -168,34 +188,117 @@ export function FloatingChat() {
       { _id: pendingAiId, role: "assistant", content: "", createdAt: now },
     ]);
     setBusy(true);
+    setStage("knowledge");
     try {
-      const res = await fetch(`/api/chat/threads/${threadId}/messages`, {
+      /*
+        스트리밍으로 받는다. 한 번에 받으면 답이 다 만들어질 때까지 화면이 비어 있고,
+        길수록 더 오래 비어 있다. 서버가 진행 단계와 본문 조각을 흘려보내고,
+        받는 대로 그 자리에 쌓는다.
+      */
+      const res = await fetch(`/api/chat/threads/${threadId}/stream`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ phone: session.phone, userId: session.id, text }),
+        body: JSON.stringify({
+          phone: session.phone,
+          userId: session.id,
+          text,
+          ...(answerTo ? { answerTo } : {}),
+        }),
       });
-      const json = (await res.json()) as {
-        ok: boolean;
-        error?: string;
-        threadTitle?: string | null;
-      };
-      if (!res.ok || !json.ok) {
+
+      if (!res.ok || !res.body) {
+        const err = (await res.json().catch(() => null)) as { error?: string } | null;
         setMessages((m) =>
           m.filter((x) => x._id !== pendingUserId && x._id !== pendingAiId).concat([
-            { _id: `err-${Date.now()}`, role: "assistant", content: json.error ?? "오류", createdAt: new Date().toISOString() },
+            { _id: `err-${Date.now()}`, role: "assistant", content: err?.error ?? "오류", createdAt: new Date().toISOString() },
           ]),
         );
         setInput(text);
         return;
       }
-      if (json.threadTitle) {
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let streamed = "";
+      let threadTitle: string | null = null;
+      let failed: string | null = null;
+      let askedBack = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+
+        // SSE는 빈 줄로 이벤트를 가른다. 마지막 조각은 아직 덜 왔을 수 있어 남겨둔다
+        const parts = buf.split("\n\n");
+        buf = parts.pop() ?? "";
+
+        for (const part of parts) {
+          const line = part.split("\n").find((l) => l.startsWith("data: "));
+          if (!line) continue;
+          let ev: Record<string, unknown>;
+          try {
+            ev = JSON.parse(line.slice(6)) as Record<string, unknown>;
+          } catch {
+            continue;
+          }
+
+          if (ev.type === "stage") {
+            setStage(String(ev.stage));
+          } else if (ev.type === "delta" && typeof ev.text === "string") {
+            setStage(null);
+            streamed += ev.text;
+            setMessages((m) =>
+              m.map((x) => (x._id === pendingAiId ? { ...x, content: streamed } : x)),
+            );
+          } else if (ev.type === "ask") {
+            // 모델이 되물었다. 본문 대신 선택지를 띄우고 이번 턴은 여기서 끝난다
+            setStage(null);
+            setAsk({
+              callId: String(ev.callId ?? ""),
+              question: String(ev.question ?? ""),
+              options: Array.isArray(ev.options) ? (ev.options as string[]) : [],
+            });
+          } else if (ev.type === "done") {
+            askedBack = Boolean(ev.asked);
+            threadTitle = (ev.threadTitle as string | null) ?? null;
+            if (typeof ev.assistantText === "string" && ev.assistantText) {
+              streamed = ev.assistantText;
+            }
+          } else if (ev.type === "error") {
+            failed = String(ev.error ?? "오류");
+          }
+        }
+      }
+
+      setStage(null);
+
+      if (failed) {
+        setMessages((m) =>
+          m.filter((x) => x._id !== pendingUserId && x._id !== pendingAiId).concat([
+            { _id: `err-${Date.now()}`, role: "assistant", content: failed, createdAt: new Date().toISOString() },
+          ]),
+        );
+        setInput(text);
+        return;
+      }
+
+      // 되묻기로 끝난 턴은 아직 답이 없다. 빈 말풍선을 지우고 선택지만 남긴다
+      if (askedBack) {
+        setMessages((m) => m.filter((x) => x._id !== pendingAiId));
+        return;
+      }
+
+      if (threadTitle) {
         setThreads((prev) =>
-          prev.map((t) => (t._id === threadId ? { ...t, title: json.threadTitle! } : t)),
+          prev.map((t) => (t._id === threadId ? { ...t, title: threadTitle! } : t)),
         );
       }
+
       await fetchMessages(session, threadId);
       await loadThreads(session);
-      await refreshTokenBalance(session);
+      void loadChips(true);
     } catch {
       setMessages((m) =>
         m.filter((x) => x._id !== pendingUserId && x._id !== pendingAiId).concat([
@@ -205,6 +308,7 @@ export function FloatingChat() {
       setInput(text);
     } finally {
       setBusy(false);
+      setStage(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, active, input, fetchMessages, loadThreads]);
@@ -302,8 +406,10 @@ export function FloatingChat() {
           <div style={{ flex: 1, minHeight: 0, display: "flex", position: "relative", overflow: "hidden" }}>
             {/* Messages */}
             <div style={messagesContainerStyle}>
-              {messages.length === 0 && !hydrating ? (
-                <EmptyGuide onPick={(q) => void sendText(q)} />
+              {hydrating && messages.length === 0 ? (
+                <ChatSkeleton />
+              ) : messages.length === 0 ? (
+                <EmptyGuide onPick={(q) => void sendText(q)} chips={chips} />
               ) : (
                 messages.map((m) => {
                   const isPendingAi = m._id.startsWith("local-ai-") && busy;
@@ -320,22 +426,13 @@ export function FloatingChat() {
                           padding: "0.45rem 0.65rem",
                           borderRadius: isUser ? "10px 10px 3px 10px" : "10px 10px 10px 3px",
                           background: isUser ? "var(--accent)" : m._id.startsWith("err-") ? "var(--danger-subtle)" : "var(--bg-elevated)",
-                          color: isUser ? "#fff" : m._id.startsWith("err-") ? "#fca5a5" : "var(--text-primary)",
+                          color: isUser ? "var(--on-accent)" : m._id.startsWith("err-") ? "#fca5a5" : "var(--text-primary)",
                           fontSize: 13,
                           border: isPendingAi ? "1px dashed var(--text-muted)" : undefined,
                         }}
                       >
-                        {isPendingAi ? (
-                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                            <span className="snapnote-chat-wait" style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                              응답을 작성하는 중입니다…
-                            </span>
-                            <span style={{ display: "flex", alignItems: "center" }} aria-hidden>
-                              <span className="snapnote-chat-dot" />
-                              <span className="snapnote-chat-dot" />
-                              <span className="snapnote-chat-dot" />
-                            </span>
-                          </div>
+                        {isPendingAi && !m.content ? (
+                          <StageIndicator stage={stage} slug="snapnote" />
                         ) : (
                           <Markdown>{m.content}</Markdown>
                         )}
@@ -344,6 +441,18 @@ export function FloatingChat() {
                   );
                 })
               )}
+
+              {/*
+                답이 끝나면 이어서 물어볼 것을 제안한다. 전에는 첫 화면에만
+                칩이 있어서 대화가 시작되면 사라졌다 — 그 뒤로는 무엇을 더
+                물어도 되는지 알 수 없었다.
+              */}
+              {ask ? (
+                <AskUser ask={ask} onPick={(c) => void sendText(c, ask.callId)} />
+              ) : messages.length > 0 && !busy && chips.length > 0 ? (
+                <FollowUps chips={chips} onPick={(q) => void sendText(q)} />
+              ) : null}
+
               <div ref={bottom} />
             </div>
 
@@ -472,14 +581,194 @@ const SUGGESTIONS = [
   "오답노트를 잘 쓰는 방법 알려줘",
 ];
 
-function EmptyGuide({ onPick }: { onPick: (q: string) => void }) {
+
+/**
+ * 대기 표시 — **지어낸 문구를 돌리지 않는다.**
+ * 서버가 보내는 실제 단계를 그대로 보여준다. 첫 글자가 도착하면 사라지고
+ * 본문이 그 자리에 쌓인다.
+ */
+const STAGE_TEXT: Record<string, string> = {
+  conversation: "대화를 여는 중",
+  knowledge: "참고 자료를 찾는 중",
+  thinking: "답을 정리하는 중",
+};
+
+function StageIndicator({ stage, slug }: { stage: string | null; slug: string }) {
+  const text = (stage && STAGE_TEXT[stage]) ?? "준비하는 중";
+  const order = ["knowledge", "thinking"];
+  const at = stage ? order.indexOf(stage) : -1;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 140 }}>
+      <span
+        className={slug + "-chat-wait"}
+        style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 600 }}
+      >
+        {text}…
+      </span>
+      <span style={{ display: "flex", gap: 4 }} aria-hidden>
+        {order.map((k, i) => (
+          <span
+            key={k}
+            style={{
+              height: 3,
+              width: 26,
+              borderRadius: 999,
+              background: at >= i && at >= 0 ? "var(--accent)" : "var(--border)",
+              transition: "background .25s ease",
+            }}
+          />
+        ))}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * 첫 로딩 스켈레톤.
+ * 이력을 불러오는 동안 완전히 빈 화면이었다. 흰 화면은 "없다"로 읽히는데
+ * 실제로는 곧 나타난다. 대화 모양의 자리를 미리 잡아 그 오해를 없앤다.
+ */
+function ChatSkeleton() {
+  const rows: Array<{ w: number; mine: boolean }> = [
+    { w: 52, mine: true },
+    { w: 88, mine: false },
+    { w: 70, mine: false },
+    { w: 40, mine: true },
+    { w: 80, mine: false },
+  ];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }} aria-hidden>
+      {rows.map((r, i) => (
+        <div key={i} style={{ display: "flex", justifyContent: r.mine ? "flex-end" : "flex-start" }}>
+          <span
+            className="chat-skeleton"
+            style={{
+              display: "block",
+              width: `${r.w}%`,
+              height: r.mine ? 30 : 52,
+              borderRadius: r.mine ? "10px 10px 3px 10px" : "10px 10px 10px 3px",
+            }}
+          />
+        </div>
+      ))}
+      <span className="sr-only">대화를 불러오는 중</span>
+    </div>
+  );
+}
+
+/**
+ * 모델이 되물었을 때 뜨는 선택지.
+ *
+ * OpenAI API에 되묻기 전용 기능은 없다. 함수 도구(`ask_user`)를 모델이 "부르면"
+ * 여기서 버튼으로 그리고, 고른 값을 도구 결과로 되돌려 대화를 잇는다.
+ * → `lib/askUserTool.ts`
+ */
+function AskUser({
+  ask,
+  onPick,
+}: {
+  ask: { callId: string; question: string; options: string[] };
+  onPick: (choice: string) => void;
+}) {
+  return (
+    <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", flexShrink: 0 }}>
+      <div
+        style={{
+          maxWidth: "92%",
+          padding: "0.6rem 0.75rem",
+          borderRadius: "10px 10px 10px 3px",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--accent)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--accent)",
+          }}
+        >
+          하나만 알려주세요
+        </span>
+        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, fontWeight: 600 }}>
+          {ask.question}
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-start" }}>
+          {ask.options.map((o) => (
+            <button key={o} type="button" className="chat-suggestion" onClick={() => onPick(o)}>
+              {o}
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+          직접 입력해서 답해도 돼요.
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 답변 뒤에 붙는 이어질 질문.
+ * 빈 화면의 안내 칩과 모양을 나눈다 — 저기는 소개고, 여기는 방금 읽은 답에
+ * 이어 붙이는 것이다. 그래서 목록 끝에 조용히 놓는다.
+ */
+function FollowUps({ chips, onPick }: { chips: string[]; onPick: (q: string) => void }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        alignItems: "flex-start",
+        marginTop: 4,
+        paddingTop: 10,
+        borderTop: "1px solid var(--border-subtle)",
+        flexShrink: 0,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "var(--text-muted)",
+        }}
+      >
+        이어서 물어보기
+      </span>
+      {chips.map((q) => (
+        <button key={q} type="button" className="chat-suggestion" onClick={() => onPick(q)}>
+          {q}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function EmptyGuide({
+  onPick,
+  chips,
+}: {
+  onPick: (q: string) => void;
+  /** 서버에서 받은 것. 아직 못 받았으면 고정 목록으로 시작한다 */
+  chips: string[];
+}) {
+  const items = chips.length > 0 ? chips : SUGGESTIONS;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 4 }}>
       <GuideBubble text="안녕하세요, **SnapNote 오답 도우미**예요. 오답노트에 담은 문제를 어떻게 다시 풀지 같이 정리해 드려요." />
       <GuideBubble text="이런 걸 물어볼 수 있어요 👇" />
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
-        {SUGGESTIONS.map((q) => (
+        {items.map((q) => (
           <button
             key={q}
             type="button"
@@ -584,7 +873,7 @@ const fabStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   animation: "fab-spin 6s linear infinite",
-  filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.35))",
+  filter: "drop-shadow(0 4px 14px rgba(38,13,63,.28))",
 };
 
 const panelStyle: CSSProperties = {
@@ -600,7 +889,9 @@ const panelStyle: CSSProperties = {
   background: "var(--bg-card)",
   display: "flex",
   flexDirection: "column",
-  boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
+  // 결쩜사는 순수 검정을 쓰지 않는다. 그림자에도 보라를 섞는다
+  border: "1px solid var(--border)",
+  boxShadow: "0 1px 2px rgba(38,13,63,.06), 0 18px 50px rgba(38,13,63,.18)",
   overflow: "hidden",
 };
 
