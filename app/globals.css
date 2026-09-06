@@ -1,3 +1,5 @@
+@import "./palette.css";
+
 /* ── 색 토큰 — 결쩜사(kyulzzumsa.co.kr) 라이트 ──
  * 이 앱은 **테마가 하나뿐이다.** 선택 UI도, `data-theme` 속성도 없다.
  * 값은 fitlog · 2hbk 의 라이트와 똑같이 맞춘다 — 앱을 오갈 때 밝기가 바뀌지 않도록.
@@ -15,38 +17,6 @@
   --radius-full: 9999px;
   --nav-height: 56px;
   --nav-top: 0px;
-
-  /* 색 */
-  --bg-primary: #f7fbfb;
-  --bg-secondary: #e8f2f3;
-  --bg-card: #ffffff;
-  --bg-elevated: #ffffff;
-  --border: rgba(17, 98, 113, 0.14);
-  --border-subtle: rgba(17, 98, 113, 0.08);
-  --text-primary: #0f2027;
-  --text-secondary: #566b70;
-  --text-muted: #5e7377;
-  --accent: #116271;
-  --accent-hover: #0d5866;
-  --accent-subtle: rgba(17, 98, 113, 0.08);
-  --point: #c9a84c;
-  --point-subtle: rgba(201, 168, 76, 0.12);
-  /*
-   * 금색을 **글자로 쓸 때는 이 값**을 쓴다. --point 는 알약 배경·구분선처럼
-   * 넓거나 좁은 **면적** 전용이다. 금색 알약 위에 금색 글자를 얹으면 2.1:1 이라
-   * 안 읽힌다 — 실제로 세 앱에서 그러고 있었다.
-   * 다크 테마에서는 금색이 짙은 면 위라 그대로 읽히므로 --point 와 같다.
-   */
-  --point-ink: #725c1a;
-  --danger: #e0455f;
-  --danger-subtle: rgba(224, 69, 95, 0.1);
-  --success: #2f9e74;
-  --success-subtle: rgba(47, 158, 116, 0.12);
-  --warning: #c9a84c;
-  --input-bg: #ffffff;
-  --input-border: rgba(15, 72, 84, 0.14);
-  --gold: #c9a84c;
-  --on-accent: #ffffff;
 }
 
 * {
