@@ -873,7 +873,7 @@ const fabStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   animation: "fab-spin 6s linear infinite",
-  filter: "drop-shadow(0 4px 14px rgba(38,13,63,.28))",
+  filter: "drop-shadow(0 4px 14px rgba(6,34,40,.28))",
 };
 
 const panelStyle: CSSProperties = {
@@ -889,9 +889,9 @@ const panelStyle: CSSProperties = {
   background: "var(--bg-card)",
   display: "flex",
   flexDirection: "column",
-  // 결쩜사는 순수 검정을 쓰지 않는다. 그림자에도 보라를 섞는다
+  // 결쩜사는 순수 검정을 쓰지 않는다. 그림자에도 청록을 섞는다
   border: "1px solid var(--border)",
-  boxShadow: "0 1px 2px rgba(38,13,63,.06), 0 18px 50px rgba(38,13,63,.18)",
+  boxShadow: "0 1px 2px rgba(6,34,40,.06), 0 18px 50px rgba(6,34,40,.18)",
   overflow: "hidden",
 };
 

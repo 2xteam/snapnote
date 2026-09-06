@@ -296,7 +296,7 @@ function tabBtnStyle(active: boolean): CSSProperties {
     borderRadius: "var(--radius-full)",
     border: "none",
     background: active ? "var(--accent)" : "var(--bg-card)",
-    color: active ? "#000" : "var(--text-secondary)",
+    color: active ? "var(--on-accent)" : "var(--text-secondary)",
     fontWeight: 600,
     fontSize: 14,
     cursor: "pointer",

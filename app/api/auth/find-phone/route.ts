@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       email,
       "[SnapNote] 등록된 전화번호 안내",
       `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;">
-        <h2 style="color:#2ee8ae;margin:0 0 16px;">SnapNote</h2>
+        <h2 style="color:#116271;margin:0 0 16px;">SnapNote</h2>
         <p>안녕하세요, <strong>${user.name}</strong>님.</p>
         <p>요청하신 계정에 등록된 전화번호는 다음과 같습니다:</p>
         <div style="background:#f5f5f5;padding:16px;border-radius:12px;text-align:center;font-size:20px;font-weight:700;letter-spacing:2px;margin:16px 0;">

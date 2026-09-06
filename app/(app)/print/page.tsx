@@ -127,7 +127,7 @@ export default function PrintPage() {
             </label>
           ))}
         </div>
-        <button type="button" onClick={doPrint} disabled={printableItems.length === 0} style={{ marginTop: 12, width: "100%", padding: "0.75rem", background: printableItems.length > 0 ? "var(--accent)" : "var(--bg-elevated)", color: printableItems.length > 0 ? "#000" : "var(--text-muted)", border: "none", fontWeight: 600, borderRadius: "var(--radius-sm)", cursor: printableItems.length > 0 ? "pointer" : "default" }}>
+        <button type="button" onClick={doPrint} disabled={printableItems.length === 0} style={{ marginTop: 12, width: "100%", padding: "0.75rem", background: printableItems.length > 0 ? "var(--accent)" : "var(--bg-elevated)", color: printableItems.length > 0 ? "var(--on-accent)" : "var(--text-muted)", border: "none", fontWeight: 600, borderRadius: "var(--radius-sm)", cursor: printableItems.length > 0 ? "pointer" : "default" }}>
           🖨️ 인쇄 ({printableItems.length}개)
         </button>
       </section>
