@@ -875,6 +875,8 @@ a[style*="var(--bg-card)"]:hover {
   border-radius: 11px;
   font-size: 15px;
   font-weight: 700;
+  /* <a class="btn"> 이 브라우저 기본 밑줄을 받는다 */
+  text-decoration: none;
   font-family: inherit;
   cursor: pointer;
 }
@@ -883,6 +885,13 @@ a[style*="var(--bg-card)"]:hover {
   background: linear-gradient(135deg, #14788a, #0d5866);
   box-shadow: 0 10px 24px rgba(6, 60, 72, 0.18);
   color: #fff;
+}
+
+/* 작은 버튼 — 헤더 우측처럼 좁은 자리에 */
+.btn--sm {
+  padding: 7px 13px;
+  font-size: 12.5px;
+  border-radius: 9px;
 }
 
 .btn--ghost {
