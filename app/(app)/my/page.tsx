@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { AccountWithdrawLink } from "@/components/AccountWithdrawLink";
 import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
 import { loadSession, type SessionUser } from "@/lib/session";
 
@@ -123,6 +124,7 @@ export default function MyPage() {
         </div>
       )}
 
+      <AccountWithdrawLink />
     </div>
   );
 }
