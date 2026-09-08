@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isOpenAiApiKeyAuthError, isOpenAiKeyConfigured } from "@/lib/openaiKey";
 import { wrongItemsFromImage } from "@/lib/wrongNoteVision";
+import { requireConsents } from "@/lib/requireConsent";
 import { readMultipartImage } from "@/lib/readMultipartImage";
 import { deductTokens } from "@/lib/useToken";
 
@@ -19,6 +20,14 @@ export async function POST(req: Request) {
 
     const parsed = await readMultipartImage(req);
     if (!parsed.ok) return parsed.response;
+
+    /*
+      국외 이전 동의를 **서버에서** 본다. 이 라우트는 사진을 OpenAI(미국)로
+      보낸다. 화면에서만 막으면 직접 부르는 쪽이 그대로 통과한다.
+      없으면 412 → lib/requireConsent.ts
+    */
+    const consentDenied = await requireConsents(parsed.userId, ["overseas"]);
+    if (consentDenied) return consentDenied;
 
     const userId = parsed.userId ?? "";
     if (userId) {
