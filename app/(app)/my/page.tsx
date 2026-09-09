@@ -11,6 +11,8 @@ export default function MyPage() {
   const [session, setSession] = useState<SessionUser | null>(null);
 
   const [email, setEmail] = useState<string>("");
+  /** 전화번호는 쿠키에 없다 — /api/me 로 받는다 */
+  const [phone, setPhone] = useState<string>("");
   const [emailInput, setEmailInput] = useState("");
   const [emailEditing, setEmailEditing] = useState(false);
   const [emailBusy, setEmailBusy] = useState(false);
@@ -28,7 +30,12 @@ export default function MyPage() {
     if (!session) return;
     (async () => {
       try {
-        const res = await fetch(`/api/stats/me?phone=${encodeURIComponent(session.phone)}&userId=${encodeURIComponent(session.id)}`);
+        /* 전화번호는 세션 쿠키에 없다 — 서버에서 받는다 → app/api/me */
+        void fetch("/api/me")
+          .then((r) => r.json() as Promise<{ ok: boolean; me?: { phone?: string | null } }>)
+          .then((j) => { if (j.ok) setPhone(j.me?.phone ?? ""); })
+          .catch(() => {});
+        const res = await fetch(`/api/stats/me`);
         const json = (await res.json()) as { ok: boolean; email?: string; tokens?: number };
         if (json.ok) {
           setEmail(json.email ?? "");
@@ -52,7 +59,7 @@ export default function MyPage() {
       const res = await fetch("/api/auth/update-email", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ phone: session.phone, userId: session.id, email: trimmed }),
+        body: JSON.stringify({ email: trimmed }),
       });
       const json = (await res.json()) as { ok: boolean; email?: string; error?: string };
       if (!res.ok || !json.ok) { setEmailMsg(json.error ?? "이메일 등록에 실패했습니다."); return; }
@@ -76,7 +83,7 @@ export default function MyPage() {
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: 15 }}>{session.name}</div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{session.phone}</div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{phone}</div>
           </div>
         </div>
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border-subtle)" }}>

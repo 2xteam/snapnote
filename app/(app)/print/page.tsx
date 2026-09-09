@@ -30,7 +30,7 @@ export default function PrintPage() {
   useEffect(() => {
     if (!session) return;
     (async () => {
-      const res = await fetch(`/api/wrong-notes?phone=${encodeURIComponent(session.phone)}`);
+      const res = await fetch(`/api/wrong-notes`);
       const json = (await res.json()) as { ok: boolean; items?: NoteRow[] };
       if (json.ok && json.items) setNotes(json.items);
     })();

@@ -36,7 +36,7 @@ export default function NoteDetailPage() {
 
   const load = useCallback(async (s: SessionUser) => {
     const [nRes, iRes] = await Promise.all([
-      fetch(`/api/wrong-notes/${noteId}?phone=${encodeURIComponent(s.phone)}`),
+      fetch(`/api/wrong-notes/${noteId}`),
       fetch(`/api/wrong-items?noteId=${encodeURIComponent(noteId)}`),
     ]);
     const nj = (await nRes.json()) as { ok: boolean; item?: NoteInfo };
@@ -95,7 +95,6 @@ export default function NoteDetailPage() {
 
       const fd = new FormData();
       fd.set("file", file);
-      fd.set("phone", session.phone);
       fd.set("noteId", noteId);
       const uploadRes = await fetch("/api/upload-image", { method: "POST", body: fd });
       const uploadJson = (await uploadRes.json()) as { ok: boolean; url?: string; error?: string };
@@ -107,7 +106,7 @@ export default function NoteDetailPage() {
       const saveRes = await fetch("/api/wrong-items", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ noteId, phone: session.phone, imageUrl: uploadJson.url }),
+        body: JSON.stringify({ noteId, imageUrl: uploadJson.url }),
       });
       const saveJson = (await saveRes.json()) as { ok: boolean; error?: string };
       if (!saveRes.ok || !saveJson.ok) { setMsg(saveJson.error ?? "저장 실패"); return; }
@@ -128,7 +127,7 @@ export default function NoteDetailPage() {
 
   const confirmDelete = async () => {
     if (!deleteTarget || !session) return;
-    const res = await fetch(`/api/wrong-items/${deleteTarget}?phone=${encodeURIComponent(session.phone)}`, { method: "DELETE" });
+    const res = await fetch(`/api/wrong-items/${deleteTarget}`, { method: "DELETE" });
     const json = (await res.json()) as { ok: boolean };
     if (!res.ok || !json.ok) { setMsg("삭제 실패"); }
     else { setItems((prev) => prev.filter((it) => it._id !== deleteTarget)); }

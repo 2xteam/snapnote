@@ -45,14 +45,14 @@ export default function HomeFoldersPage() {
   }, [router]);
 
   const refresh = useCallback(async (s: SessionUser) => {
-    const res = await fetch(`/api/folders?phone=${encodeURIComponent(s.phone)}&parentId=`);
+    const res = await fetch(`/api/folders?parentId=`);
     const json = (await res.json()) as { ok: boolean; items?: FolderRow[] };
     if (json.ok && json.items) setFolders(json.items);
     setLoaded(true);
   }, []);
 
   const refreshTrash = useCallback(async (s: SessionUser) => {
-    const res = await fetch(`/api/trash?phone=${encodeURIComponent(s.phone)}`);
+    const res = await fetch(`/api/trash`);
     const json = (await res.json()) as { ok: boolean; folders?: TrashFolder[]; notes?: TrashNote[] };
     if (json.ok) {
       setTrashFolders(json.folders ?? []);
@@ -76,16 +76,16 @@ export default function HomeFoldersPage() {
     setMsg(null);
     if (dialog?.type === "create") {
       if (!dialogName.trim()) return;
-      const res = await fetch("/api/folders", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ phone: session.phone, name: dialogName.trim(), createdBy: session.id, parentFolderId: null }) });
+      const res = await fetch("/api/folders", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: dialogName.trim(), createdBy: session.id, parentFolderId: null }) });
       const json = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !json.ok) { setMsg(json.error ?? "폴더 생성 실패"); return; }
     } else if (dialog?.type === "rename") {
       if (!dialogName.trim()) return;
-      const res = await fetch(`/api/folders/${dialog.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ phone: session.phone, name: dialogName.trim() }) });
+      const res = await fetch(`/api/folders/${dialog.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: dialogName.trim() }) });
       const json = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !json.ok) { setMsg(json.error ?? "이름 수정 실패"); return; }
     } else if (dialog?.type === "confirmDelete") {
-      const res = await fetch(`/api/folders/${dialog.id}?phone=${encodeURIComponent(session.phone)}`, { method: "DELETE" });
+      const res = await fetch(`/api/folders/${dialog.id}`, { method: "DELETE" });
       const json = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !json.ok) { setMsg(json.error ?? "삭제 실패"); return; }
     }
@@ -100,7 +100,6 @@ export default function HomeFoldersPage() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        phone: session.phone,
         action: confirm.action,
         type: confirm.type,
         id: confirm.id,

@@ -67,8 +67,6 @@ export async function POST(req: Request) {
     const doc = await Inquiry.create({
       userId: new mongoose.Types.ObjectId(viewer.uid),
       // 스키마가 phone·name 을 필수로 둔다. 요청자의 회원 문서에서 채운다
-      phone: viewer.doc.phone ?? "",
-      name: viewer.doc.name ?? viewer.doc.nickname ?? "",
       category,
       title,
       content,

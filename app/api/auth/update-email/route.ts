@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { normalizePhone } from "@/lib/phone";
-import { getUserModel } from "@/models/User";
+import { requireViewer } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
+/**
+ * 이메일 등록·변경.
+ *
+ * 본인 확인은 HttpOnly 세션 토큰으로 한다 — 본문의 `phone`·`userId` 는 더 받지 않는다.
+ * 세션 쿠키에 전화번호가 없어져 클라이언트가 보낼 수도 없다 → lib/session.ts
+ */
 export async function POST(req: Request) {
   try {
-    let body: { phone?: string; userId?: string; email?: string };
+    const auth = await requireViewer(req);
+    if ("error" in auth) return auth.error;
+    const user = auth.viewer.doc;
+
+    let body: { email?: string };
     try {
       body = await req.json();
     } catch {
@@ -17,32 +25,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const phone = typeof body.phone === "string" ? normalizePhone(body.phone) : "";
-    const userId = typeof body.userId === "string" ? body.userId : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-
-    if (!phone || !userId) {
-      return NextResponse.json(
-        { ok: false, error: "phone과 userId가 필요합니다." },
-        { status: 400 },
-      );
-    }
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
         { ok: false, error: "올바른 이메일 주소를 입력해 주세요." },
         { status: 400 },
-      );
-    }
-
-    await connectDB();
-    const User = getUserModel();
-    const user = await User.findById(userId).exec();
-
-    if (!user || user.phone !== phone) {
-      return NextResponse.json(
-        { ok: false, error: "권한이 없습니다." },
-        { status: 403 },
       );
     }
 

@@ -31,7 +31,7 @@ export default function TrashPage() {
   }, [router]);
 
   const refresh = useCallback(async (s: SessionUser) => {
-    const res = await fetch(`/api/trash?phone=${encodeURIComponent(s.phone)}`);
+    const res = await fetch(`/api/trash`);
     const json = (await res.json()) as { ok: boolean; folders?: TrashFolder[]; notes?: TrashNote[] };
     if (json.ok) {
       setFolders(json.folders ?? []);
@@ -52,7 +52,6 @@ export default function TrashPage() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        phone: session.phone,
         action: confirm.action,
         type: confirm.type,
         id: confirm.id,

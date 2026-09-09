@@ -95,8 +95,7 @@ export async function POST(req: Request) {
       user: {
         id: String(user._id),
         name: user.name ?? user.nickname ?? "",
-        phone: user.phone ?? "",
-        email: user.email ?? "",
+        hasEmail: Boolean(user.email),
       },
       token: signSessionToken(String(user._id), user.userId),
     });

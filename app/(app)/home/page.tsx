@@ -29,8 +29,8 @@ export default function HomePage() {
     if (!session) return;
     (async () => {
       const [fRes, nRes] = await Promise.all([
-        fetch(`/api/folders?phone=${encodeURIComponent(session.phone)}&parentId=`),
-        fetch(`/api/wrong-notes?phone=${encodeURIComponent(session.phone)}`),
+        fetch(`/api/folders?parentId=`),
+        fetch(`/api/wrong-notes`),
       ]);
       const fj = (await fRes.json()) as { ok: boolean; items?: FolderRow[] };
       const nj = (await nRes.json()) as { ok: boolean; items?: NoteRow[] };
