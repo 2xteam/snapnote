@@ -40,3 +40,4 @@ yarn-error.log*
 certificates
 .vercel
 .env*
+scripts/backup/

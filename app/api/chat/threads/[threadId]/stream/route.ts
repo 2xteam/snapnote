@@ -1,12 +1,12 @@
 import mongoose, { type HydratedDocument } from "mongoose";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { normalizePhone } from "@/lib/phone";
+import { requireViewer } from "@/lib/auth";
 import { buildChatInstructions, generateChatSubjectLine } from "@/lib/chatOpenAi";
 import { isOpenAiKeyConfigured } from "@/lib/openaiKey";
 import { createOpenAiConversation, streamOpenAiResponse } from "@/lib/openAiConversations";
+import { requireConsents } from "@/lib/requireConsent";
 import { ChatThread, type ChatThreadDocument } from "@/models/ChatThread";
-import { getUserModel } from "@/models/User";
 import { deductTokens } from "@/lib/useToken";
 import { ASK_USER_TOOL, parseAskUser } from "@/lib/askUserTool";
 
@@ -34,24 +34,24 @@ export const maxDuration = 60;
 
 type ChatThreadHydrated = HydratedDocument<ChatThreadDocument>;
 
+/**
+ * 내 스레드인지 확인한다. 소유자는 `viewer.uid` 하나다 — 본문의
+ * `phone`·`userId` 는 옛 화면이 아직 보내지만 읽지 않는다 → lib/auth.ts
+ */
 async function assertThread(
   threadId: string,
-  phone: string,
-  userId: string,
+  uid: string,
 ): Promise<{ ok: true; thread: ChatThreadHydrated } | { ok: false; error: string; status: number }> {
-  const p = normalizePhone(phone);
-  if (!mongoose.isValidObjectId(threadId) || !p || !mongoose.isValidObjectId(userId)) {
-    return { ok: false, error: "threadId, phone, userId가 필요합니다.", status: 400 };
+  if (!mongoose.isValidObjectId(threadId)) {
+    return { ok: false, error: "threadId가 필요합니다.", status: 400 };
   }
 
   await connectDB();
-  const user = await getUserModel().findById(userId).exec();
-  if (!user || user.phone !== p) {
-    return { ok: false, error: "권한이 없습니다.", status: 403 };
-  }
-
-  const thread = (await ChatThread.findById(threadId).exec()) as ChatThreadHydrated | null;
-  if (!thread || String(thread.userId) !== String(userId)) {
+  const thread = (await ChatThread.findOne({
+    _id: new mongoose.Types.ObjectId(threadId),
+    userId: new mongoose.Types.ObjectId(uid),
+  }).exec()) as ChatThreadHydrated | null;
+  if (!thread) {
     return { ok: false, error: "대화를 찾을 수 없습니다.", status: 404 };
   }
 
@@ -59,20 +59,29 @@ async function assertThread(
 }
 
 export async function POST(req: Request, ctx: { params: Promise<{ threadId: string }> }) {
+  const auth = await requireViewer(req);
+  if ("error" in auth) return auth.error;
+  const { viewer } = auth;
+
   if (!isOpenAiKeyConfigured()) {
     return NextResponse.json({ ok: false, error: "OPENAI_API_KEY가 필요합니다." }, { status: 503 });
   }
 
+  /*
+    국외 이전 동의를 **서버에서** 본다. 대화 내용이 OpenAI(미국)로 나간다.
+    OpenAI 에 무엇이든 보내기 전에 막아야 한다 → lib/requireConsent.ts
+  */
+  const consentDenied = await requireConsents(viewer.uid, ["overseas"]);
+  if (consentDenied) return consentDenied;
+
   const { threadId } = await ctx.params;
-  let body: { phone?: string; userId?: string; text?: string; answerTo?: string };
+  let body: { text?: string; answerTo?: string };
   try {
     body = (await req.json()) as typeof body;
   } catch {
     return NextResponse.json({ ok: false, error: "JSON 본문이 필요합니다." }, { status: 400 });
   }
 
-  const phone = typeof body.phone === "string" ? body.phone : "";
-  const userId = typeof body.userId === "string" ? body.userId.trim() : "";
   const text = typeof body.text === "string" ? body.text.trim() : "";
   /* 되묻기에 답하는 턴 — 사용자 메시지 대신 도구 결과를 넣는다 */
   const answerTo = typeof body.answerTo === "string" ? body.answerTo.trim() : "";
@@ -80,13 +89,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ threadId: stri
     return NextResponse.json({ ok: false, error: "text가 필요합니다." }, { status: 400 });
   }
 
-  const gate = await assertThread(threadId, phone, userId);
+  const gate = await assertThread(threadId, viewer.uid);
   if (!gate.ok) {
     return NextResponse.json({ ok: false, error: gate.error }, { status: gate.status });
   }
   const thread = gate.thread;
 
-  const tokenResult = await deductTokens(userId, 1);
+  const tokenResult = await deductTokens(viewer.uid, 1);
   if (!tokenResult.ok) {
     return NextResponse.json({ ok: false, error: tokenResult.error }, { status: 402 });
   }

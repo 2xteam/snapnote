@@ -40,13 +40,15 @@ function LoginForm() {
       const json = (await res.json()) as {
         ok: boolean;
         user?: SessionUser;
+        /** 서버 API 가 믿는 서명 토큰. 없이 저장하면 화면만 열리고 API 는 401 이 된다 */
+        token?: string;
         error?: string;
       };
       if (!res.ok || !json.ok || !json.user) {
         setMsg(json.error ?? "로그인에 실패했습니다.");
         return;
       }
-      saveSession(json.user);
+      saveSession(json.user, json.token);
       window.location.replace(next);
     } catch {
       setMsg("네트워크 오류입니다.");

@@ -2,26 +2,30 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { connectDB } from "@/lib/db";
-import { normalizePhone } from "@/lib/phone";
+import { requireViewer, badRequest, notFound, serverError } from "@/lib/auth";
 import { WrongNote } from "@/models/WrongNote";
 import { WrongItem } from "@/models/WrongItem";
 import { getR2Client, getR2Bucket, getR2PublicUrl } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
-async function assertItemAccess(itemId: string, phone: string) {
-  const p = normalizePhone(phone);
-  if (!mongoose.isValidObjectId(itemId) || !p) {
-    return { ok: false as const, response: NextResponse.json({ ok: false, error: "itemId, phone이 필요합니다." }, { status: 400 }) };
+/**
+ * 오답 항목은 소유자를 직접 갖지 않는다. 부모 오답노트의 `createdBy` 가 요청자인지로
+ * 가른다. 남의 항목이면 403 이 아니라 **404** — 있는지조차 알려주지 않는다.
+ * 쿼리의 `phone` 은 옛 화면이 아직 보내지만 읽지 않는다 → lib/auth.ts
+ */
+async function assertItemAccess(itemId: string, uid: string) {
+  if (!mongoose.isValidObjectId(itemId)) {
+    return { ok: false as const, response: badRequest("itemId가 필요합니다.") };
   }
   await connectDB();
   const item = await WrongItem.findById(itemId).exec();
   if (!item) {
-    return { ok: false as const, response: NextResponse.json({ ok: false, error: "항목을 찾을 수 없습니다." }, { status: 404 }) };
+    return { ok: false as const, response: notFound("항목을 찾을 수 없습니다.") };
   }
-  const note = await WrongNote.findById(item.noteId).exec();
-  if (!note || note.phone !== p) {
-    return { ok: false as const, response: NextResponse.json({ ok: false, error: "권한이 없습니다." }, { status: 403 }) };
+  const note = await WrongNote.findOne({ _id: item.noteId, createdBy: uid }).exec();
+  if (!note) {
+    return { ok: false as const, response: notFound("항목을 찾을 수 없습니다.") };
   }
   return { ok: true as const, item };
 }
@@ -31,11 +35,12 @@ export async function DELETE(
   ctx: { params: Promise<{ itemId: string }> },
 ) {
   try {
-    const { itemId } = await ctx.params;
-    const url = new URL(req.url);
-    const phone = url.searchParams.get("phone") ?? "";
+    const auth = await requireViewer(req);
+    if ("error" in auth) return auth.error;
+    const { viewer } = auth;
 
-    const access = await assertItemAccess(itemId, phone);
+    const { itemId } = await ctx.params;
+    const access = await assertItemAccess(itemId, viewer.uid);
     if (!access.ok) return access.response;
 
     const imageUrl = access.item.imageUrl as string | undefined;
@@ -57,7 +62,6 @@ export async function DELETE(
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    return serverError(err);
   }
 }

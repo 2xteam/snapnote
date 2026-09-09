@@ -1,40 +1,26 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
+import { requireViewer, serverError } from "@/lib/auth";
 import { IS_TOKEN_SYSTEM_ENABLED } from "@/lib/constants";
-import { normalizePhone } from "@/lib/phone";
-import { getUserModel } from "@/models/User";
 
 export const runtime = "nodejs";
 
+/*
+  "나"는 `viewer.uid` 하나다. 쿼리의 `phone`·`userId` 는 옛 화면이
+  아직 보내지만 읽지 않는다 → lib/auth.ts
+*/
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const phone = normalizePhone(url.searchParams.get("phone") ?? "");
-    const userId = url.searchParams.get("userId") ?? "";
-
-    if (!phone || !mongoose.isValidObjectId(userId)) {
-      return NextResponse.json(
-        { ok: false, error: "phone, userId 쿼리가 필요합니다." },
-        { status: 400 },
-      );
-    }
-
-    await connectDB();
-    const user = await getUserModel().findById(userId).exec();
-    if (!user || user.phone !== phone) {
-      return NextResponse.json({ ok: false, error: "권한이 없습니다." }, { status: 403 });
-    }
+    const auth = await requireViewer(req);
+    if ("error" in auth) return auth.error;
+    const { viewer } = auth;
 
     return NextResponse.json({
       ok: true,
-      email: user.email ?? "",
-      tokens: IS_TOKEN_SYSTEM_ENABLED ? user.tokens ?? 0 : 0,
+      email: viewer.doc.email ?? "",
+      tokens: IS_TOKEN_SYSTEM_ENABLED ? viewer.doc.tokens ?? 0 : 0,
       stats: {},
     });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    return serverError(err);
   }
 }

@@ -1,4 +1,4 @@
-import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { getR2Bucket, getR2Client, getR2PublicUrl } from "@/lib/r2";
 
 /**
@@ -12,7 +12,8 @@ import { getR2Bucket, getR2Client, getR2PublicUrl } from "@/lib/r2";
  * ```
  * fitlog 인바디   fitlog/{userId}/…           사용자별  → 접두사 가능
  * fitlog 피검사   fitlog/blood/{userId}/…     사용자별  → 접두사 가능
- * SnapNote        {phone}/{noteId}/…          전화번호별. 번호가 없으면 파일명만
+ * SnapNote(옛)    {phone}/{noteId}/…          전화번호별. 번호가 없으면 파일명만
+ * SnapNote(새)    snapnote/{회원 _id}/{noteId}/… 2026-09-09 부터 → 접두사 가능 (deleteR2ByPrefix)
  * 2hbk            profiles/{uuid} · goals/{uuid}   사용자 정보가 **아예 없다**
  * ```
  *
@@ -78,6 +79,38 @@ export async function deleteR2Objects(urls: string[]): Promise<number> {
       /* 여기서 멈추면 그 사람은 영영 폐기되지 않는다. 남기고 계속한다 */
       console.error("[purge] R2 삭제 요청 실패", e);
     }
+  }
+  return removed;
+}
+
+/**
+ * 접두사로 쓸어 담는다 — 새 키(`snapnote/{회원 _id}/`)에만 쓴다.
+ * DB 에 URL 이 남지 않은 고아 파일까지 잡힌다. 옛 키(전화번호)는 URL 역산으로만.
+ * 실패해도 던지지 않는다 — deleteR2Objects 와 같은 이유.
+ */
+export async function deleteR2ByPrefix(prefix: string): Promise<number> {
+  if (!prefix || !prefix.endsWith("/")) return 0;
+  let removed = 0;
+  let token: string | undefined;
+  try {
+    do {
+      const page = await getR2Client().send(
+        new ListObjectsV2Command({ Bucket: getR2Bucket(), Prefix: prefix, ContinuationToken: token }),
+      );
+      const keys = (page.Contents ?? []).map((o) => o.Key).filter((k): k is string => Boolean(k));
+      if (keys.length > 0) {
+        const res = await getR2Client().send(
+          new DeleteObjectsCommand({
+            Bucket: getR2Bucket(),
+            Delete: { Objects: keys.map((Key) => ({ Key })), Quiet: true },
+          }),
+        );
+        removed += keys.length - (res.Errors?.length ?? 0);
+      }
+      token = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (token);
+  } catch (e) {
+    console.error(`[purge] R2 접두사 삭제 실패 ${prefix}`, e);
   }
   return removed;
 }

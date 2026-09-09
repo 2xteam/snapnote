@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
-import { deleteR2Objects } from "@/lib/purgeR2";
+import { deleteR2ByPrefix, deleteR2Objects } from "@/lib/purgeR2";
 import { ChatThread } from "@/models/ChatThread";
+import { deleteOpenAiConversations } from "@/lib/purgeOpenAiConversations";
 import { getEventModel } from "@/models/Event";
 import { Folder } from "@/models/Folder";
 import { getInquiryModel } from "@/models/Inquiry";
@@ -42,18 +43,28 @@ export async function purgeUserData(id: string): Promise<PurgeResult> {
     .map((i) => (typeof i.imageUrl === "string" ? i.imageUrl : ""))
     .filter(Boolean);
 
-  const removedFiles = await deleteR2Objects(imageUrls);
+  /* URL 역산(옛 전화번호 키) + 소유자 접두사 쓸어담기(새 키 — 고아 파일까지) */
+  const removedFiles = (await deleteR2Objects(imageUrls)) + (await deleteR2ByPrefix(`snapnote/${id}/`));
 
   const deletedItems = noteIds.length
     ? await WrongItem.deleteMany({ noteId: { $in: noteIds } }).exec()
     : { deletedCount: 0 };
   const notes = await WrongNote.deleteMany({ createdBy: oid }).exec();
   const folders = await Folder.deleteMany({ createdBy: oid }).exec();
+  /*
+    대화 본문은 OpenAI Conversations 에만 있다. 스레드를 지우기 **전에** 그쪽 삭제를
+    요청한다 — 행을 지운 뒤에는 대화 id 를 찾을 수 없다. 실패해도 DB 삭제는 계속한다.
+    → lib/purgeOpenAiConversations.ts
+  */
+  const threadRows = await ChatThread.find({ userId: oid }, { openAiConversationId: 1 }).lean().exec();
+  const conversations = await deleteOpenAiConversations(threadRows.map((t) => t.openAiConversationId));
   const threads = await ChatThread.deleteMany({ userId: oid }).exec();
   const events = await getEventModel().deleteMany({ userId: oid }).exec();
   const inquiries = await getInquiryModel().deleteMany({ userId: oid }).exec();
 
   return {
+    openAiConversations: conversations.deleted,
+    openAiConversationsFailed: conversations.failed,
     wrongItems: deletedItems.deletedCount ?? 0,
     wrongNotes: notes.deletedCount ?? 0,
     folders: folders.deletedCount ?? 0,
