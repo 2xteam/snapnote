@@ -5,6 +5,7 @@ import "./globals.css";
 // .sheet { border-radius: var(--radius-lg) } 를 이겨야 한다.
 // 생성 파일이다: myjane/design/elements.css → npm run elements -- --write
 import "./elements.css";
+import { ImpersonationBar } from "@/components/ImpersonationBar";
 
 export const metadata: Metadata = {
   title: "SnapNote",
@@ -48,6 +49,8 @@ export default function RootLayout({
         />
       </head>
       <body style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
+        {/* 관리자 대리 로그인 경고 바 — 대리 세션일 때만 맨 위에 고정된다 → components/ImpersonationBar.tsx */}
+        <ImpersonationBar />
         {children}
       </body>
     </html>
